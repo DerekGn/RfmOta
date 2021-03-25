@@ -22,6 +22,7 @@
 * SOFTWARE.
 */
 
+using RfmUsb;
 using System;
 using System.IO;
 
