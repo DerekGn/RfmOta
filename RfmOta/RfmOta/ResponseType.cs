@@ -26,13 +26,37 @@ namespace RfmOta
 {
     internal enum ResponseType
     {
+        /// <summary>
+        /// The requested operation executed correctly
+        /// </summary>
         Ok,
+        /// <summary>
+        /// Calculate the application flash memory range crc
+        /// </summary>
         Crc,
+        /// <summary>
+        /// Ping the boot loader
+        /// </summary>
         Ping,
+        /// <summary>
+        /// Get the flash size from the target device
+        /// </summary>
         FlashSize,
+        /// <summary>
+        /// The number of flash writes exceed the allowed number in one operation
+        /// </summary>
         ErrorNumberWrites,
+        /// <summary>
+        /// The request message had an invalid length
+        /// </summary>
         ErrorInvalidLength,
+        /// <summary>
+        /// 
+        /// </summary>
         ErrorInvalidWrite,
+        /// <summary>
+        /// The flash write address is out of range
+        /// </summary>
         ErrorInvalidWriteAddress
     };
 }

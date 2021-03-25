@@ -52,6 +52,11 @@ namespace RfmOta
         private Stream _stream;
         private uint _crc;
 
+        /// <summary>
+        /// Create an instance of a <see cref="OtaService"/>
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="rfmUsb"></param>
         public OtaService(ILogger<IOtaService> logger, IRfmUsb rfmUsb)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -67,8 +72,18 @@ namespace RfmOta
             };
         }
 
-        public bool OtaUpdate(string serialPort, int baudRate, byte outputPower, Stream stream, out uint crc)
+        ///<inheritdoc/>
+        public bool OtaUpdate(string serialPort, int baudRate, int outputPower, Stream stream, out uint crc)
         {
+            if (string.IsNullOrWhiteSpace(serialPort))
+                throw new ArgumentOutOfRangeException(nameof(serialPort));
+
+            if (baudRate < 300 || baudRate > 115200)
+                throw new ArgumentOutOfRangeException(nameof(baudRate));
+
+            if (outputPower < -2 || outputPower > 20)
+                throw new ArgumentOutOfRangeException(nameof(baudRate));
+
             _stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
             bool result = true;
@@ -76,7 +91,7 @@ namespace RfmOta
             try
             {
                 crc = 0;
-                InitaliseRfmUsb(serialPort, baudRate, outputPower);
+                InitaliseRfmUsb(serialPort, baudRate, (byte)outputPower);
 
                 foreach (var step in _steps)
                 {
@@ -97,7 +112,7 @@ namespace RfmOta
             return result;
         }
 
-        private bool SetCrc()
+        internal bool SetCrc()
         {
             return HandleRfmUsbOperation(
                 nameof(OtaService),
@@ -121,7 +136,7 @@ namespace RfmOta
                 });
         }
 
-        private bool Reboot()
+        internal bool Reboot()
         {
             return HandleRfmUsbOperation(
                 nameof(OtaService),
@@ -135,7 +150,7 @@ namespace RfmOta
                 });
         }
 
-        private bool SendHexData()
+        internal bool SendHexData()
         {
             return HandleRfmUsbOperation(
                 nameof(OtaService),
@@ -204,7 +219,7 @@ namespace RfmOta
                 });
         }
 
-        private bool GetFlashSize()
+        internal bool GetFlashSize()
         {
             return HandleRfmUsbOperation(
                 nameof(OtaService),
@@ -227,7 +242,7 @@ namespace RfmOta
                 });
         }
 
-        private bool PingBootLoader()
+        internal bool PingBootLoader()
         {
             return HandleRfmUsbOperation(
                 nameof(OtaService),
@@ -289,6 +304,7 @@ namespace RfmOta
 
             return true;
         }
+
         private void SendRequest(IList<byte> request, [CallerMemberName] string memberName = "")
         {
             Stopwatch sw = new Stopwatch();
@@ -306,6 +322,8 @@ namespace RfmOta
 
             _logger.LogInformation($"BootLoader {memberName} Ok. Tx Time: [{sw.ElapsedTicks * 1000 / Stopwatch.Frequency} ms]");
         }
+
+        [DebuggerStepThrough]
         private bool HandleRfmUsbOperation(string className, Func<bool> operation, [CallerMemberName] string memberName = "")
         {
             Stopwatch sw = new Stopwatch();

@@ -26,6 +26,9 @@ using System.Collections.Generic;
 
 namespace RfmOta
 {
+    /// <summary>
+    /// A class that collates flash writes into a single set of bytes
+    /// </summary>
     internal class FlashWrites
     {
         private readonly List<IReadOnlyList<byte>> _writes;

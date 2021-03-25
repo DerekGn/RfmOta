@@ -26,10 +26,25 @@ namespace RfmOta
 {
     internal enum RequestType
     {
+        /// <summary>
+        /// Calculate the CRC of the application flash memory and store to device
+        /// </summary>
         Crc,
+        /// <summary>
+        /// Ping the bootloader
+        /// </summary>
         Ping,
+        /// <summary>
+        /// Write a set of bytes to flash
+        /// </summary>
         Write,
+        /// <summary>
+        /// Reboot the device
+        /// </summary>
         Reboot,
+        /// <summary>
+        /// Get the flash size from the device
+        /// </summary>
         FlashSize
     };
 }

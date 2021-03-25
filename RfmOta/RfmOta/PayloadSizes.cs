@@ -24,6 +24,9 @@
 
 namespace RfmOta
 {
+    /// <summary>
+    /// The expected payload sizes for each of the request types
+    /// </summary>
     internal static class PayloadSizes
     {
         public const int FlashSizeResponse = 13;
