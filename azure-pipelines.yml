@@ -1,6 +1,8 @@
 variables:
 - name: BuildParameters.solution
   value: '**\*.sln'
+- name: TestProject
+  value: '**/*UnitTests.csproj'
 
 name: v$(Major).$(Minor).$(Patch)
 
@@ -17,6 +19,17 @@ steps:
       command: 'build'
       projects: $(BuildParameters.solution)
       configuration: $(BuildConfiguration)
+  - task: DotNetCoreCLI@2
+    displayName: "Run Unit Tests"
+    inputs:
+      command: 'test'
+      projects: $(TestProject)
+      arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
+  - task: PublishTestResults@2
+    displayName: "Publish Test Results"
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: '**\*.trx'
   - task: DotNetCoreCLI@2
     displayName: "Pack Project"
     inputs:
