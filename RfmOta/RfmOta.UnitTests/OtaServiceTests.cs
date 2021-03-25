@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using RfmUsb;
 using System.Collections.Generic;
+using System.IO;
 using Xunit;
 
 namespace RfmOta.UnitTests
@@ -64,11 +65,16 @@ namespace RfmOta.UnitTests
         public void TestSendHexDataOk()
         {
             // Arrange
+            _otaService.SetStream(GetHexStream());
+
+            _mockRfmUsb.Setup(_ => _.TransmitReceive(It.IsAny<List<byte>>(), It.IsAny<int>()))
+                .Returns(new List<byte>() { 1, (byte)ResponseType.Ok + 0x80 });
 
             // Act
             var result = _otaService.SendHexData();
 
             // Assert
+            result.Should().BeTrue();
         }
 
         [Fact]
@@ -97,6 +103,22 @@ namespace RfmOta.UnitTests
 
             // Assert
             result.Should().BeTrue();
+        }
+
+        private Stream GetHexStream()
+        {
+            var ms = new MemoryStream();
+            var sw = new StreamWriter(ms);
+
+            sw.WriteLine(":1028000040200020A12C00009D2C00009D2C0000E9");
+            sw.WriteLine(":1028100000000000000000000000000000000000B8");
+            sw.WriteLine(":102820000000000000000000000000009D2C0000DF");
+            sw.WriteLine(":1028300000000000000000009D2C00009D2C000006");
+            
+            sw.Flush();
+            ms.Position = 0;
+
+            return ms;
         }
     }
 }

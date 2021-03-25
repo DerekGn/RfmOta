@@ -262,6 +262,11 @@ namespace RfmOta
                 });
         }
 
+        internal void SetStream(Stream stream)
+        {
+            _stream = stream;
+        }
+
         private bool SendAndValidateResponse(IList<byte> request,
             int expectedSize, ResponseType expectedResponse,
             out IList<byte> response, [CallerMemberName] string memberName = "")

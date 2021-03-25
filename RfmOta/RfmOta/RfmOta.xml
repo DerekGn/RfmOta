@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RfmOta</name>
+    </assembly>
+    <members>
+        <member name="T:RfmOta.FlashWrites">
+            <summary>
+            A class that collates flash writes into a single set of bytes
+            </summary>
+        </member>
+        <member name="T:RfmOta.IOtaService">
+            <summary>
+            Defines the interface for the Ota service
+            </summary>
+        </member>
+        <member name="M:RfmOta.IOtaService.OtaUpdate(System.String,System.Int32,System.Int32,System.IO.Stream,System.UInt32@)">
+            <summary>
+            Perform an Ota update of an Rfm69 node that is running in bootloader mode
+            </summary>
+            <param name="serialPort">The serial port to use to communicate with the <see cref="!:IRfmUsb"/> instance</param>
+            <param name="baudRate">The baud rate for communication with the <see cref="!:IRfmUsb"/> instance</param>
+            <param name="outputPower">The output power for the RfmUsb</param>
+            <param name="stream">The stream for the hex file to upload to the device</param>
+            <param name="crc">The crc calculated for the uploaded flash image</param>
+            <returns>true if the update succeeds</returns>
+        </member>
+        <member name="M:RfmOta.OtaService.#ctor(Microsoft.Extensions.Logging.ILogger{RfmOta.IOtaService},RfmUsb.IRfmUsb)">
+            <summary>
+            Create an instance of a <see cref="T:RfmOta.OtaService"/>
+            </summary>
+            <param name="logger"></param>
+            <param name="rfmUsb"></param>
+        </member>
+        <member name="M:RfmOta.OtaService.OtaUpdate(System.String,System.Int32,System.Int32,System.IO.Stream,System.UInt32@)">
+            <inheritdoc/>
+        </member>
+        <member name="T:RfmOta.PayloadSizes">
+            <summary>
+            The expected payload sizes for each of the request types
+            </summary>
+        </member>
+        <member name="F:RfmOta.RequestType.Crc">
+            <summary>
+            Calculate the CRC of the application flash memory and store to device
+            </summary>
+        </member>
+        <member name="F:RfmOta.RequestType.Ping">
+            <summary>
+            Ping the bootloader
+            </summary>
+        </member>
+        <member name="F:RfmOta.RequestType.Write">
+            <summary>
+            Write a set of bytes to flash
+            </summary>
+        </member>
+        <member name="F:RfmOta.RequestType.Reboot">
+            <summary>
+            Reboot the device
+            </summary>
+        </member>
+        <member name="F:RfmOta.RequestType.FlashSize">
+            <summary>
+            Get the flash size from the device
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.Ok">
+            <summary>
+            The requested operation executed correctly
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.Crc">
+            <summary>
+            Calculate the application flash memory range crc
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.Ping">
+            <summary>
+            Ping the boot loader
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.FlashSize">
+            <summary>
+            Get the flash size from the target device
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.ErrorNumberWrites">
+            <summary>
+            The number of flash writes exceed the allowed number in one operation
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.ErrorInvalidLength">
+            <summary>
+            The request message had an invalid length
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.ErrorInvalidWrite">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.ErrorInvalidWriteAddress">
+            <summary>
+            The flash write address is out of range
+            </summary>
+        </member>
+    </members>
+</doc>
