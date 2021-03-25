@@ -91,7 +91,7 @@ namespace RfmOta
             try
             {
                 crc = 0;
-                InitaliseRfmUsb(serialPort, baudRate, (byte)outputPower);
+                InitaliseRfmUsb(serialPort, baudRate, outputPower);
 
                 foreach (var step in _steps)
                 {
@@ -353,7 +353,7 @@ namespace RfmOta
             return result;
         }
 
-        private void InitaliseRfmUsb(string serialPort, int baudRate, byte outputPower)
+        private void InitaliseRfmUsb(string serialPort, int baudRate, int outputPower)
         {
             _rfmUsb.Open(serialPort, baudRate);
 

@@ -11,7 +11,11 @@
     <PackageProjectUrl>https://github.com/DerekGn/RfmOta</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DerekGn/RfmOta</RepositoryUrl>
     <PackageTags>Rfm69 Ota</PackageTags>
-    <PackageReleaseNotes>1.0.0 Initial version</PackageReleaseNotes>
+    <PackageReleaseNotes>1.0.0 Initial version
+1.0.6 Updated RfmUsb dependancy package</PackageReleaseNotes>
+    <AssemblyVersion>1.0.6.0</AssemblyVersion>
+    <FileVersion>1.0.6.0</FileVersion>
+    <Version>1.0.6</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -25,7 +29,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-    <PackageReference Include="RfmUsb" Version="1.0.6" />
+    <PackageReference Include="RfmUsb" Version="1.0.10" />
   </ItemGroup>
 
   <ItemGroup>
