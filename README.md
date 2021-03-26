@@ -1,6 +1,22 @@
 # RfmOta
 
+[![Build Status](https://dev.azure.com/DerekGn/GitHub/_apis/build/status/DerekGn.RfmOta?branchName=main)](https://dev.azure.com/DerekGn/GitHub/_build/latest?definitionId=6&branchName=main)
+
 A library for the flashing hex files to Rfm69 nodes over the wireless.
+
+## Installing RfmOta
+
+Install the RfmOta package via nuget package manager console:
+
+```
+Install-Package RfmOta
+```
+
+## Supported .Net Runtimes
+
+The RfmOta package is compatible with the following runtimes:
+
+* .NET Standard 2.0
 
 ## Using OtaService
 
