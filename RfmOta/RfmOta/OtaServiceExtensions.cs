@@ -27,8 +27,16 @@ using RfmUsb;
 
 namespace RfmOta
 {
+    /// <summary>
+    /// <see cref="IServiceCollection"/> extensions
+    /// </summary>
     public static class OtaServiceExtensions
     {
+        /// <summary>
+        /// Add the Ota services to the <see cref="IServiceCollection"/>
+        /// </summary>
+        /// <param name="serviceCollection">The <see cref="IServiceCollection"/> to add the ota services</param>
+        /// <returns></returns>
         public static IServiceCollection AddOta(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<IOtaService, OtaService>();
