@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RfmOta</name>
+    </assembly>
+    <members>
+        <member name="T:RfmOta.Exceptions.OtaException">
+            <summary>
+            An <see cref="T:System.Exception"/> that is thrown when an error occurs during Ota updates
+            </summary>
+        </member>
+        <member name="M:RfmOta.Exceptions.OtaException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:RfmOta.Exceptions.OtaException"/> class.
+            </summary>
+        </member>
+        <member name="M:RfmOta.Exceptions.OtaException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:RfmOta.Exceptions.OtaException"/> class.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:RfmOta.Exceptions.OtaException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:RfmOta.Exceptions.OtaException"/> class.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception.</param>
+            <param name="inner">The exception that is the cause of the current exception, 
+            or a null reference (Nothing in Visual Basic) if no inner exception is specified.</param>
+        </member>
+        <member name="M:RfmOta.Exceptions.OtaException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the <see cref="T:RfmOta.Exceptions.OtaException"/> class with serialized data.
+            </summary>
+            <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> that holds 
+            the serialized object data about the exception being thrown.</param>
+            <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information
+            about the source or destination.</param>
+        </member>
+        <member name="T:RfmOta.FlashWrites">
+            <summary>
+            A class that collates flash writes into a single set of bytes
+            </summary>
+        </member>
+        <member name="T:RfmOta.IOtaService">
+            <summary>
+            Defines the interface for the Ota service
+            </summary>
+        </member>
+        <member name="M:RfmOta.IOtaService.OtaUpdate(System.String,System.Int32,System.Int32,System.IO.Stream,System.UInt32@)">
+            <summary>
+            Perform an Ota update of an Rfm69 node that is running in bootloader mode
+            </summary>
+            <param name="serialPort">The serial port to use to communicate with the <see cref="T:RfmUsb.IRfmUsb"/> instance</param>
+            <param name="baudRate">The baud rate for communication with the <see cref="T:RfmUsb.IRfmUsb"/> instance</param>
+            <param name="outputPower">The output power for the RfmUsb</param>
+            <param name="stream">The stream for the hex file to upload to the device</param>
+            <param name="crc">The crc calculated for the uploaded flash image</param>
+            <returns>true if the update succeeds</returns>
+        </member>
+        <member name="M:RfmOta.OtaService.#ctor(Microsoft.Extensions.Logging.ILogger{RfmOta.IOtaService},RfmUsb.IRfmUsb)">
+            <summary>
+            Create an instance of a <see cref="T:RfmOta.OtaService"/>
+            </summary>
+            <param name="logger"></param>
+            <param name="rfmUsb"></param>
+        </member>
+        <member name="M:RfmOta.OtaService.OtaUpdate(System.String,System.Int32,System.Int32,System.IO.Stream,System.UInt32@)">
+            <inheritdoc/>
+        </member>
+        <member name="T:RfmOta.OtaServiceExtensions">
+            <summary>
+            <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> extensions
+            </summary>
+        </member>
+        <member name="M:RfmOta.OtaServiceExtensions.AddOta(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Add the Ota services to the <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>
+            </summary>
+            <param name="serviceCollection">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to add the ota services</param>
+            <returns></returns>
+        </member>
+        <member name="T:RfmOta.PayloadSizes">
+            <summary>
+            The expected payload sizes for each of the request types
+            </summary>
+        </member>
+        <member name="F:RfmOta.RequestType.Crc">
+            <summary>
+            Calculate the CRC of the application flash memory and store to device
+            </summary>
+        </member>
+        <member name="F:RfmOta.RequestType.Ping">
+            <summary>
+            Ping the bootloader
+            </summary>
+        </member>
+        <member name="F:RfmOta.RequestType.Write">
+            <summary>
+            Write a set of bytes to flash
+            </summary>
+        </member>
+        <member name="F:RfmOta.RequestType.Reboot">
+            <summary>
+            Reboot the device
+            </summary>
+        </member>
+        <member name="F:RfmOta.RequestType.FlashSize">
+            <summary>
+            Get the flash size from the device
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.Ok">
+            <summary>
+            The requested operation executed correctly
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.Crc">
+            <summary>
+            Calculate the application flash memory range crc
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.Ping">
+            <summary>
+            Ping the boot loader
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.FlashSize">
+            <summary>
+            Get the flash size from the target device
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.ErrorNumberWrites">
+            <summary>
+            The number of flash writes exceed the allowed number in one operation
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.ErrorInvalidLength">
+            <summary>
+            The request message had an invalid length
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.ErrorInvalidWrite">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="F:RfmOta.ResponseType.ErrorInvalidWriteAddress">
+            <summary>
+            The flash write address is out of range
+            </summary>
+        </member>
+    </members>
+</doc>

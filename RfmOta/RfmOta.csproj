@@ -11,9 +11,12 @@
     <PackageProjectUrl>https://github.com/DerekGn/RfmOta</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DerekGn/RfmOta</RepositoryUrl>
     <PackageTags>Rfm69 Ota</PackageTags>
-    <PackageReleaseNotes>1.0.0 Initial version
-1.0.6 Updated RfmUsb dependancy package
-1.0.9 Updated RfmUsb dependancy packages, Added string name key, updated documentation</PackageReleaseNotes>
+    <PackageReleaseNotes>
+      1.0.0 Initial version
+      1.0.6 Updated RfmUsb dependency package
+      1.0.9 Updated RfmUsb dependency packages, Added string name key, updated documentation
+      1.0.10 Added xml documents for package
+    </PackageReleaseNotes>
     <AssemblyVersion>1.0.6.0</AssemblyVersion>
     <FileVersion>1.0.6.0</FileVersion>
     <Version>1.0.6</Version>
@@ -24,6 +27,10 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>D:\Git\RfmOta\RfmOta\RfmOta\RfmOta.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>D:\Git\RfmOta\RfmOta\RfmOta.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
