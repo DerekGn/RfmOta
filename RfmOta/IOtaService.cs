@@ -22,7 +22,6 @@
 * SOFTWARE.
 */
 
-using RfmUsb;
 using System;
 using System.IO;
 
@@ -36,12 +35,10 @@ namespace RfmOta
         /// <summary>
         /// Perform an Ota update of an Rfm69 node that is running in bootloader mode
         /// </summary>
-        /// <param name="serialPort">The serial port to use to communicate with the <see cref="IRfmUsb"/> instance</param>
-        /// <param name="baudRate">The baud rate for communication with the <see cref="IRfmUsb"/> instance</param>
         /// <param name="outputPower">The output power for the RfmUsb</param>
         /// <param name="stream">The stream for the hex file to upload to the device</param>
         /// <param name="crc">The crc calculated for the uploaded flash image</param>
         /// <returns>true if the update succeeds</returns>
-        public bool OtaUpdate(string serialPort, int baudRate, int outputPower, Stream stream, out uint crc);
+        public bool OtaUpdate(int outputPower, Stream stream, out uint crc);
     }
 }
