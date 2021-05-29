@@ -55,6 +55,8 @@
             <param name="stream">The stream for the hex file to upload to the device</param>
             <param name="crc">The crc calculated for the uploaded flash image</param>
             <returns>true if the update succeeds</returns>
+            <remarks>The <see cref="T:RfmOta.IOtaService"/> depends on an <see cref="T:RfmUsb.IRfmUsb"/> instance to transmit and receive packets.
+            The containing application must open and close the <see cref="T:RfmUsb.IRfmUsb"/> instance.</remarks>
         </member>
         <member name="M:RfmOta.OtaService.#ctor(Microsoft.Extensions.Logging.ILogger{RfmOta.IOtaService},RfmUsb.IRfmUsb)">
             <summary>

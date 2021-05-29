@@ -82,26 +82,19 @@ namespace RfmOta
 
             bool result = true;
 
-            try
-            {
-                crc = 0;
-                InitaliseRfmUsb(outputPower);
+            crc = 0;
+            InitaliseRfmUsb(outputPower);
 
-                foreach (var step in _steps)
+            foreach (var step in _steps)
+            {
+                if (!step())
                 {
-                    if (!step())
-                    {
-                        result = false;
-                        break;
-                    }
+                    result = false;
+                    break;
                 }
+            }
 
-                crc = _crc;
-            }
-            finally
-            {
-                _rfmUsb?.Close();
-            }
+            crc = _crc;
 
             return result;
         }
@@ -349,9 +342,8 @@ namespace RfmOta
 
         private void InitaliseRfmUsb(int outputPower)
         {
+            _logger.LogDebug($"Initialising the {nameof(IRfmUsb)} instance");
             _rfmUsb.Reset();
-
-            _logger.LogInformation(_rfmUsb.Version);
 
             _rfmUsb.PacketFormat = true;
 

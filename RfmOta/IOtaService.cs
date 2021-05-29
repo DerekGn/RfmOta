@@ -22,6 +22,7 @@
 * SOFTWARE.
 */
 
+using RfmUsb;
 using System;
 using System.IO;
 
@@ -39,6 +40,8 @@ namespace RfmOta
         /// <param name="stream">The stream for the hex file to upload to the device</param>
         /// <param name="crc">The crc calculated for the uploaded flash image</param>
         /// <returns>true if the update succeeds</returns>
+        /// <remarks>The <see cref="IOtaService"/> depends on an <see cref="IRfmUsb"/> instance to transmit and receive packets.
+        /// The containing application must open and close the <see cref="IRfmUsb"/> instance.</remarks>
         public bool OtaUpdate(int outputPower, Stream stream, out uint crc);
     }
 }
