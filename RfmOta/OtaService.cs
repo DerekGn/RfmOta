@@ -73,16 +73,10 @@ namespace RfmOta
         }
 
         ///<inheritdoc/>
-        public bool OtaUpdate(string serialPort, int baudRate, int outputPower, Stream stream, out uint crc)
+        public bool OtaUpdate(int outputPower, Stream stream, out uint crc)
         {
-            if (string.IsNullOrWhiteSpace(serialPort))
-                throw new ArgumentOutOfRangeException(nameof(serialPort));
-
-            if (baudRate < 300 || baudRate > 115200)
-                throw new ArgumentOutOfRangeException(nameof(baudRate));
-
             if (outputPower < -2 || outputPower > 20)
-                throw new ArgumentOutOfRangeException(nameof(baudRate));
+                throw new ArgumentOutOfRangeException(nameof(outputPower));
 
             _stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
@@ -91,7 +85,7 @@ namespace RfmOta
             try
             {
                 crc = 0;
-                InitaliseRfmUsb(serialPort, baudRate, outputPower);
+                InitaliseRfmUsb(outputPower);
 
                 foreach (var step in _steps)
                 {
@@ -353,10 +347,8 @@ namespace RfmOta
             return result;
         }
 
-        private void InitaliseRfmUsb(string serialPort, int baudRate, int outputPower)
+        private void InitaliseRfmUsb(int outputPower)
         {
-            _rfmUsb.Open(serialPort, baudRate);
-
             _rfmUsb.Reset();
 
             _logger.LogInformation(_rfmUsb.Version);

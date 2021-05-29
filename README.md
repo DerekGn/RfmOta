@@ -26,7 +26,13 @@ try
     using var stream = File.OpenRead(options.HexFile);
     using var otaservice = _serviceProvider.GetService<IOtaService>();
 
-    if (otaservice.OtaUpdate(options.SerialPort, options.BaudRate, (byte) options.OutputPower, stream, out uint crc))
+    // RfmUsb instance should be configured as singleton
+    using var rfmUsb = _serviceProvider.GetService<IRfmUsb>();
+
+    // Open the rfmUsb instance and configure the port and baud rate
+    rfmUsb.Open(options.SerialPort, options.BaudRate);
+
+    if (otaservice.OtaUpdate((byte) options.OutputPower, stream, out uint crc))
     {
         logger.LogInformation($"OTA flash update completed. Crc: [0x{crc:X}]");
     }
