@@ -42,16 +42,13 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+    <PackageReference Include="RfmUsb" Version="1.0.19" />
   </ItemGroup>
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>RfmOta.UnitTests, PublicKey=00240000048000009400000006020000002400005253413100040000010001007da22a36ea70ea5442bd2669227188aeee71a04e15e42cb306600a89305032e4b9a0988923c2141262adc555821d7bb25e01bf63990930c9b30d4935d21f484b2fb9f74efc1e7022c64fe9abcf76dc1e012f3a8482f651a977bdfae856351c3faa638357a86ff2d1a08583e010def89f2fc0df6e5b0c6556ddaa1af6e61f14ba</_Parameter1>
     </AssemblyAttribute>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\RfmUsb\RfmUsb\RfmUsb.csproj" />
   </ItemGroup>
   
 </Project>
