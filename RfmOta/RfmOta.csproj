@@ -16,6 +16,8 @@
       1.0.6 Updated RfmUsb dependency package
       1.0.9 Updated RfmUsb dependency packages, Added string name key, updated documentation
       1.0.10 Added xml documents for package
+      2.0.0 Re-factored RfmUsb usage
+      2.0.1 Re-factored RfmUsb usage
     </PackageReleaseNotes>
     <AssemblyVersion>1.0.6.0</AssemblyVersion>
     <FileVersion>1.0.6.0</FileVersion>
@@ -40,7 +42,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-    <PackageReference Include="RfmUsb" Version="1.0.13" />
+    <PackageReference Include="RfmUsb" Version="1.0.19" />
   </ItemGroup>
 
   <ItemGroup>

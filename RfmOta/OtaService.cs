@@ -73,41 +73,28 @@ namespace RfmOta
         }
 
         ///<inheritdoc/>
-        public bool OtaUpdate(string serialPort, int baudRate, int outputPower, Stream stream, out uint crc)
+        public bool OtaUpdate(int outputPower, Stream stream, out uint crc)
         {
-            if (string.IsNullOrWhiteSpace(serialPort))
-                throw new ArgumentOutOfRangeException(nameof(serialPort));
-
-            if (baudRate < 300 || baudRate > 115200)
-                throw new ArgumentOutOfRangeException(nameof(baudRate));
-
             if (outputPower < -2 || outputPower > 20)
-                throw new ArgumentOutOfRangeException(nameof(baudRate));
+                throw new ArgumentOutOfRangeException(nameof(outputPower));
 
             _stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
             bool result = true;
 
-            try
-            {
-                crc = 0;
-                InitaliseRfmUsb(serialPort, baudRate, outputPower);
+            crc = 0;
+            InitaliseRfmUsb(outputPower);
 
-                foreach (var step in _steps)
+            foreach (var step in _steps)
+            {
+                if (!step())
                 {
-                    if (!step())
-                    {
-                        result = false;
-                        break;
-                    }
+                    result = false;
+                    break;
                 }
+            }
 
-                crc = _crc;
-            }
-            finally
-            {
-                _rfmUsb?.Close();
-            }
+            crc = _crc;
 
             return result;
         }
@@ -353,13 +340,10 @@ namespace RfmOta
             return result;
         }
 
-        private void InitaliseRfmUsb(string serialPort, int baudRate, int outputPower)
+        private void InitaliseRfmUsb(int outputPower)
         {
-            _rfmUsb.Open(serialPort, baudRate);
-
+            _logger.LogDebug($"Initialising the {nameof(IRfmUsb)} instance");
             _rfmUsb.Reset();
-
-            _logger.LogInformation(_rfmUsb.Version);
 
             _rfmUsb.PacketFormat = true;
 
