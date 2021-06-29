@@ -2,6 +2,8 @@
 
 [![Build Status](https://dev.azure.com/DerekGn/GitHub/_apis/build/status/DerekGn.RfmOta?branchName=main)](https://dev.azure.com/DerekGn/GitHub/_build/latest?definitionId=6&branchName=main)
 
+[![NuGet Badge](https://buildstats.info/nuget/RfmOta)](https://www.nuget.org/packages/RfmOta/)
+
 A library for the flashing hex files to Rfm69 nodes over the wireless.
 
 ## Installing RfmOta
