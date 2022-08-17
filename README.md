@@ -25,6 +25,8 @@ The RfmOta package is compatible with the following runtimes:
 ``` csharp
 try
 {
+    // The DI provider must be configured to instantiate the 
+    // dependencies ILogger<IOtaService>, IRfmUsb, IIntelHexStreamReaderFactory
     using var stream = File.OpenRead(options.HexFile);
     using var otaservice = _serviceProvider.GetService<IOtaService>();
 
