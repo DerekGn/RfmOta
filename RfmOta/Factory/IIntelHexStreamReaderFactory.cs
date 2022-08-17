@@ -22,19 +22,21 @@
 * SOFTWARE.
 */
 
-namespace RfmOta
+using HexIO;
+using System.IO;
+
+namespace RfmOta.Factory
 {
     /// <summary>
-    /// The expected payload sizes for each of the request types
+    /// Defines a factory for <see cref="IIntelHexStreamReader"/> instances
     /// </summary>
-    internal static class PayloadSizes
+    public interface IIntelHexStreamReaderFactory
     {
-        public const int FlashSizeResponse = 13;
-
-        public const int PingResponse = 1;
-
-        public const int CrcResponse = 5;
-
-        public const int OkResponse = 1;
+        /// <summary>
+        /// Create an instance of a <see cref="IIntelHexStreamReader"/>
+        /// </summary>
+        /// <param name="stream">The <see cref="Stream"/> to create the reader for</param>
+        /// <returns>An instance of <see cref="IIntelHexStreamReader"/></returns>
+        IIntelHexStreamReader Create(Stream stream);
     }
 }

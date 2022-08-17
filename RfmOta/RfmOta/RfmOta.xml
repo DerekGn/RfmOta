@@ -37,10 +37,88 @@
             <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext"/> that contains contextual information
             about the source or destination.</param>
         </member>
+        <member name="T:RfmOta.Factory.IIntelHexStreamReaderFactory">
+            <summary>
+            Defines a factory for <see cref="T:HexIO.IIntelHexStreamReader"/> instances
+            </summary>
+        </member>
+        <member name="M:RfmOta.Factory.IIntelHexStreamReaderFactory.Create(System.IO.Stream)">
+            <summary>
+            Create an instance of a <see cref="T:HexIO.IIntelHexStreamReader"/>
+            </summary>
+            <param name="stream">The <see cref="T:System.IO.Stream"/> to create the reader for</param>
+            <returns>An instance of <see cref="T:HexIO.IIntelHexStreamReader"/></returns>
+        </member>
+        <member name="T:RfmOta.Factory.IntelHexStreamReaderFactory">
+            <summary>
+            A factory class for creation of <see cref="T:HexIO.IntelHexStreamReader"/> instances
+            </summary>
+        </member>
+        <member name="M:RfmOta.Factory.IntelHexStreamReaderFactory.Create(System.IO.Stream)">
+            <inheritdoc/>
+        </member>
+        <member name="T:RfmOta.FlashInfo">
+            <summary>
+            The flash info read from the device
+            </summary>
+        </member>
+        <member name="M:RfmOta.FlashInfo.#ctor(System.UInt32,System.UInt32,System.UInt32)">
+            <summary>
+            Create an instance of a <see cref="T:RfmOta.FlashInfo"/>
+            </summary>
+            <param name="startAddress">The start address of the flash</param>
+            <param name="numberOfPages">The number of flash pages</param>
+            <param name="pageSize">The page size in bytes</param>
+        </member>
+        <member name="P:RfmOta.FlashInfo.StartAddress">
+            <summary>
+            The start address of the flash segment
+            </summary>
+        </member>
+        <member name="P:RfmOta.FlashInfo.NumberOfPages">
+            <summary>
+            The number of flash pages
+            </summary>
+        </member>
+        <member name="P:RfmOta.FlashInfo.PageSize">
+            <summary>
+            The page size in bytes
+            </summary>
+        </member>
+        <member name="P:RfmOta.FlashInfo.UpperAddress">
+            <summary>
+            The upper address of the flash memory
+            </summary>
+        </member>
+        <member name="M:RfmOta.FlashInfo.ToString">
+            <inheritdoc/>
+        </member>
         <member name="T:RfmOta.FlashWrites">
             <summary>
             A class that collates flash writes into a single set of bytes
             </summary>
+        </member>
+        <member name="M:RfmOta.FlashWrites.#ctor">
+            <summary>
+            Create an instance of a <see cref="T:RfmOta.FlashWrites"/>
+            </summary>
+        </member>
+        <member name="P:RfmOta.FlashWrites.Writes">
+            <summary>
+            The <see cref="T:System.Collections.Generic.IReadOnlyList`1"/> of <see cref="T:System.Collections.Generic.IReadOnlyList`1"/> of bytes to flash to the device
+            </summary>
+        </member>
+        <member name="M:RfmOta.FlashWrites.AddWrite(System.Collections.Generic.IReadOnlyList{System.Byte})">
+            <summary>
+            Add a flash write
+            </summary>
+            <param name="write"></param>
+        </member>
+        <member name="M:RfmOta.FlashWrites.GetWritesBytes">
+            <summary>
+            Get the consolidated set of flash writes
+            </summary>
+            <returns>A <see cref="T:System.Collections.Generic.IReadOnlyList`1"/> of flash bytes to write to the devices flash memory</returns>
         </member>
         <member name="T:RfmOta.IOtaService">
             <summary>
@@ -58,12 +136,13 @@
             <remarks>The <see cref="T:RfmOta.IOtaService"/> depends on an <see cref="T:RfmUsb.IRfmUsb"/> instance to transmit and receive packets.
             The containing application must open and close the <see cref="T:RfmUsb.IRfmUsb"/> instance.</remarks>
         </member>
-        <member name="M:RfmOta.OtaService.#ctor(Microsoft.Extensions.Logging.ILogger{RfmOta.IOtaService},RfmUsb.IRfmUsb)">
+        <member name="M:RfmOta.OtaService.#ctor(Microsoft.Extensions.Logging.ILogger{RfmOta.IOtaService},RfmUsb.IRfmUsb,RfmOta.Factory.IIntelHexStreamReaderFactory)">
             <summary>
             Create an instance of a <see cref="T:RfmOta.OtaService"/>
             </summary>
             <param name="logger"></param>
             <param name="rfmUsb"></param>
+            <param name="hexStreamReaderFactory"></param>
         </member>
         <member name="M:RfmOta.OtaService.OtaUpdate(System.Int32,System.IO.Stream,System.UInt32@)">
             <inheritdoc/>
@@ -78,11 +157,16 @@
             Add the Ota services to the <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>
             </summary>
             <param name="serviceCollection">The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> to add the ota services</param>
-            <returns></returns>
+            <returns>The <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/></returns>
         </member>
         <member name="T:RfmOta.PayloadSizes">
             <summary>
             The expected payload sizes for each of the request types
+            </summary>
+        </member>
+        <member name="T:RfmOta.RequestType">
+            <summary>
+            The OTA request type
             </summary>
         </member>
         <member name="F:RfmOta.RequestType.Crc">
@@ -108,6 +192,11 @@
         <member name="F:RfmOta.RequestType.FlashSize">
             <summary>
             Get the flash size from the device
+            </summary>
+        </member>
+        <member name="T:RfmOta.ResponseType">
+            <summary>
+            The OTA response to the <see cref="T:RfmOta.RequestType"/>
             </summary>
         </member>
         <member name="F:RfmOta.ResponseType.Ok">

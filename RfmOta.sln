@@ -5,7 +5,12 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfmOta", "RfmOta\RfmOta.csproj", "{903CC2C7-A5AD-45C6-8EE6-28E2699ACDF5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RfmOta.UnitTests", "RfmOta.UnitTests\RfmOta.UnitTests.csproj", "{D972A29B-FC61-4CAA-825E-CD3A43E97971}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RfmOta.UnitTests", "RfmOta.UnitTests\RfmOta.UnitTests.csproj", "{D972A29B-FC61-4CAA-825E-CD3A43E97971}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{62523B01-834B-4DAF-84E7-B6202DDDFB27}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

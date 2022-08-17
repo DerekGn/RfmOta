@@ -4,7 +4,7 @@
 
 [![NuGet Badge](https://buildstats.info/nuget/RfmOta)](https://www.nuget.org/packages/RfmOta/)
 
-A library for the flashing hex files to Rfm69 nodes over the wireless.
+A library for the flashing hex files to Rfm69 nodes over the air.
 
 ## Installing RfmOta
 
@@ -18,13 +18,15 @@ Install-Package RfmOta
 
 The RfmOta package is compatible with the following runtimes:
 
-* .NET Standard 2.0
+* .NET Standard 2.1
 
 ## Using OtaService
 
 ``` csharp
 try
 {
+    // The DI provider must be configured to instantiate the 
+    // dependencies ILogger<IOtaService>, IRfmUsb, IIntelHexStreamReaderFactory
     using var stream = File.OpenRead(options.HexFile);
     using var otaservice = _serviceProvider.GetService<IOtaService>();
 

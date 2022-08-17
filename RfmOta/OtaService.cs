@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2021 Derek Goslin 
+* Copyright (c) 2022 Derek Goslin
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 using HexIO;
 using Microsoft.Extensions.Logging;
 using RfmOta.Exceptions;
+using RfmOta.Factory;
 using RfmUsb;
 using RfmUsb.Exceptions;
 using System;
@@ -38,29 +39,31 @@ namespace RfmOta
 {
     internal class OtaService : IOtaService
     {
+        private readonly IIntelHexStreamReaderFactory _hexStreamReaderFactory;
         private readonly ILogger<IOtaService> _logger;
-        private readonly List<Func<bool>> _steps;
+        
         private readonly IRfmUsb _rfmUsb;
 
         private const int MaxFlashWriteSize = 64;
         private const int FlashWriteRows = 2;
-
         private uint _flashWriteSize;
-        private uint _numberOfPages;
-        private uint _startAddress;
-        private uint _pageSize;
         private Stream _stream;
         private uint _crc;
+
+        internal List<Func<bool>> _steps;
+        internal FlashInfo _flashInfo;
 
         /// <summary>
         /// Create an instance of a <see cref="OtaService"/>
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="rfmUsb"></param>
-        public OtaService(ILogger<IOtaService> logger, IRfmUsb rfmUsb)
+        /// <param name="hexStreamReaderFactory"></param>
+        public OtaService(ILogger<IOtaService> logger, IRfmUsb rfmUsb, IIntelHexStreamReaderFactory hexStreamReaderFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _rfmUsb = rfmUsb ?? throw new ArgumentNullException(nameof(rfmUsb));
+            _hexStreamReaderFactory = hexStreamReaderFactory ?? throw new ArgumentNullException(nameof(hexStreamReaderFactory));
 
             _steps = new List<Func<bool>>
             {
@@ -143,39 +146,11 @@ namespace RfmOta
                 nameof(OtaService),
                 () =>
                 {
-                    using IntelHexReader hexReader = new IntelHexReader(_stream);
+                    using IIntelHexStreamReader hexReader = _hexStreamReaderFactory.Create(_stream);
 
                     do
                     {
-                        var flashWrites = new FlashWrites();
-
-                        for (int i = 0; i < FlashWriteRows; i++)
-                        {
-                            if (hexReader.Read(out uint address, out IList<byte> hexData))
-                            {
-                                if (hexData.Count > 0)
-                                {
-                                    if (hexData.Count > MaxFlashWriteSize)
-                                    {
-                                        throw new OtaException($"Invalid flash write size [{hexData.Count}] Max: [{MaxFlashWriteSize}]");
-                                    }
-
-                                    _logger.LogInformation($"Writing Address: [0x{address:X}] Count: [0x{hexData.Count:X2}]" +
-                                            $" Data: [{BitConverter.ToString(hexData.ToArray()).Replace("-", "")}]");
-                                    var write = new List<byte>();
-                                    write.AddRange(BitConverter.GetBytes(address));
-                                    write.AddRange(BitConverter.GetBytes(hexData.Count));
-                                    write.AddRange(hexData);
-                                    flashWrites.AddWrite(write);
-
-                                    _flashWriteSize += (uint)hexData.Count;
-                                }
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
+                        FlashWrites flashWrites = GetFlashWrites(hexReader);
 
                         if (flashWrites.Writes.Count > 0)
                         {
@@ -187,6 +162,7 @@ namespace RfmOta
                                 (byte)RequestType.Write,
                                 (byte)flashWrites.Writes.Count,
                             };
+
                             request.AddRange(payload);
 
                             if (!SendAndValidateResponse(
@@ -219,11 +195,12 @@ namespace RfmOta
                         return false;
                     }
 
-                    _startAddress = BitConverter.ToUInt32(response.ToArray(), 2);
-                    _numberOfPages = BitConverter.ToUInt32(response.ToArray(), 6);
-                    _pageSize = BitConverter.ToUInt32(response.ToArray(), 10);
-                    _logger.LogInformation($"App Start Address: [0x{_startAddress:X}] Number Of Pages: [0x{_numberOfPages:X}] " +
-                        $"Page Size: [0x{_pageSize:X}] Flash Size: [0x{_numberOfPages * _pageSize:X}]");
+                    _flashInfo = new FlashInfo(
+                        BitConverter.ToUInt32(response.ToArray(), 2),
+                        BitConverter.ToUInt32(response.ToArray(), 6),
+                        BitConverter.ToUInt32(response.ToArray(), 10));
+
+                    _logger.LogInformation($"FlashInfo: {_flashInfo}");
 
                     return true;
                 });
@@ -247,11 +224,6 @@ namespace RfmOta
 
                     return true;
                 });
-        }
-
-        internal void SetStream(Stream stream)
-        {
-            _stream = stream;
         }
 
         private bool SendAndValidateResponse(IList<byte> request,
@@ -343,6 +315,7 @@ namespace RfmOta
         private void InitaliseRfmUsb(int outputPower)
         {
             _logger.LogDebug($"Initialising the {nameof(IRfmUsb)} instance");
+
             _rfmUsb.Reset();
 
             _rfmUsb.PacketFormat = true;
@@ -358,6 +331,55 @@ namespace RfmOta
             _rfmUsb.Timeout = 5000;
         }
 
+        private FlashWrites GetFlashWrites(IIntelHexStreamReader hexReader)
+        {
+            var flashWrites = new FlashWrites();
+
+            bool done = false;
+
+            do
+            {
+                IntelHexRecord intelHexRecord = hexReader.ReadHexRecord();
+
+                if (intelHexRecord.RecordType == IntelHexRecordType.Data)
+                {
+                    _logger.LogDebug($"Read Intel Hex Data Record [{intelHexRecord}]");
+
+                    if (intelHexRecord.Bytes.Count > MaxFlashWriteSize)
+                    {
+                        throw new OtaException($"Invalid flash write size [0x{intelHexRecord.Bytes.Count:X}] Max: [0x{MaxFlashWriteSize:X}]");
+                    }
+
+                    if (intelHexRecord.Offset > _flashInfo.UpperAddress)
+                    {
+                        throw new OtaException($"Flash offset [0x{intelHexRecord.Offset:X}] outside Flash range [0x{_flashInfo.UpperAddress}]");
+                    }
+
+                    var write = new List<byte>();
+                    write.AddRange(BitConverter.GetBytes(intelHexRecord.Offset));
+                    write.AddRange(BitConverter.GetBytes(intelHexRecord.RecordLength));
+                    write.AddRange(intelHexRecord.Data);
+                    flashWrites.AddWrite(write);
+
+                    _flashWriteSize += (uint)intelHexRecord.Bytes.Count;
+                }
+
+                if (intelHexRecord.RecordType == IntelHexRecordType.EndOfFile)
+                {
+                    _logger.LogDebug($"Read Eof");
+                    done = true;
+                }
+
+                if(flashWrites.Writes.Count == FlashWriteRows)
+                {
+                    _logger.LogDebug($"Read [{FlashWriteRows}] Write Rows");
+                    done = true;
+                }
+            } while (!done);
+
+            return flashWrites;
+        }
+
         #region
         private bool _disposedValue;
 
@@ -371,18 +393,9 @@ namespace RfmOta
                     _rfmUsb?.Dispose();
                 }
 
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
                 _disposedValue = true;
             }
         }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~OtaService()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
 
         public void Dispose()
         {

@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2021 Derek Goslin 
+* Copyright (c) 2022 Derek Goslin 
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -33,18 +33,32 @@ namespace RfmOta
     {
         private readonly List<IReadOnlyList<byte>> _writes;
 
+        /// <summary>
+        /// Create an instance of a <see cref="FlashWrites"/>
+        /// </summary>
         public FlashWrites()
         {
             _writes = new List<IReadOnlyList<byte>>();
         }
 
+        /// <summary>
+        /// The <see cref="IReadOnlyList{T}"/> of <see cref="IReadOnlyList{T}"/> of bytes to flash to the device
+        /// </summary>
         public IReadOnlyList<IReadOnlyList<byte>> Writes => _writes.AsReadOnly();
 
+        /// <summary>
+        /// Add a flash write
+        /// </summary>
+        /// <param name="write"></param>
         public void AddWrite(IReadOnlyList<byte> write)
         {
             _writes.Add(write);
         }
 
+        /// <summary>
+        /// Get the consolidated set of flash writes
+        /// </summary>
+        /// <returns>A <see cref="IReadOnlyList{T}"/> of flash bytes to write to the devices flash memory</returns>
         public IReadOnlyList<byte> GetWritesBytes()
         {
             List<byte> writes = new List<byte>();
