@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2021 Derek Goslin 
+* Copyright (c) 2022 Derek Goslin 
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -42,6 +42,6 @@ namespace RfmOta
         /// <returns>true if the update succeeds</returns>
         /// <remarks>The <see cref="IOtaService"/> depends on an <see cref="IRfmUsb"/> instance to transmit and receive packets.
         /// The containing application must open and close the <see cref="IRfmUsb"/> instance.</remarks>
-        public bool OtaUpdate(int outputPower, Stream stream, out uint crc);
+        bool OtaUpdate(int outputPower, Stream stream, out uint crc);
     }
 }

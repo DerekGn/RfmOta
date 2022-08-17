@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2021 Derek Goslin 
+* Copyright (c) 2022 Derek Goslin 
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using RfmUsb;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RfmOta
 {
@@ -36,7 +37,8 @@ namespace RfmOta
         /// Add the Ota services to the <see cref="IServiceCollection"/>
         /// </summary>
         /// <param name="serviceCollection">The <see cref="IServiceCollection"/> to add the ota services</param>
-        /// <returns></returns>
+        /// <returns>The <see cref="IServiceCollection"/></returns>
+        [ExcludeFromCodeCoverage]
         public static IServiceCollection AddOta(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<IOtaService, OtaService>();

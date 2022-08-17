@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2021 Derek Goslin 
+* Copyright (c) 2022 Derek Goslin 
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,9 @@
 
 namespace RfmOta
 {
+    /// <summary>
+    /// The OTA response to the <see cref="RequestType"/>
+    /// </summary>
     internal enum ResponseType
     {
         /// <summary>

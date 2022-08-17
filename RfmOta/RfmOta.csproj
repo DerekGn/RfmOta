@@ -6,22 +6,23 @@
     <Authors>Derek Goslin</Authors>
     <Company>Derek Goslin</Company>
     <Description>A service for Ota updates for Rfm69 devices</Description>
-    <Copyright>Copyright © Derek Goslin 2021</Copyright>
+    <Copyright>Copyright © Derek Goslin 2022</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/DerekGn/RfmOta</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DerekGn/RfmOta</RepositoryUrl>
     <PackageTags>Rfm69 Ota</PackageTags>
     <PackageReleaseNotes>
-      1.0.0 Initial version
-      1.0.6 Updated RfmUsb dependency package
-      1.0.9 Updated RfmUsb dependency packages, Added string name key, updated documentation
-      1.0.10 Added xml documents for package
-      2.0.0 Re-factored RfmUsb usage
-      2.0.1 Re-factored RfmUsb usage
-    </PackageReleaseNotes>
-    <AssemblyVersion>1.0.6.0</AssemblyVersion>
-    <FileVersion>1.0.6.0</FileVersion>
-    <Version>1.0.6</Version>
+		1.0.0 Initial version
+		1.0.6 Updated RfmUsb dependency package
+		1.0.9 Updated RfmUsb dependency packages, Added string name key, updated documentation
+		1.0.10 Added xml documents for package
+		2.0.0 Re-factored RfmUsb usage
+		2.0.1 Re-factored RfmUsb usage
+		2.2.0 Re-factored internal implementation. Updated HexIO to version 3.0
+	</PackageReleaseNotes>
+    <AssemblyVersion>2.2.0.0</AssemblyVersion>
+    <FileVersion>2.2.0.0</FileVersion>
+    <Version>2.2.0</Version>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>RfmOta.snk</AssemblyOriginatorKeyFile>
@@ -36,12 +37,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HexIO" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
+    <PackageReference Include="HexIO" Version="3.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     <PackageReference Include="RfmUsb" Version="1.0.19" />
   </ItemGroup>
 
