@@ -18,11 +18,11 @@
 		1.0.10 Added xml documents for package
 		2.0.0 Re-factored RfmUsb usage
 		2.0.1 Re-factored RfmUsb usage
-		2.2.0 Re-factored internal implementation. Updated HexIO to version 3.0
+		2.1.0 Re-factored internal implementation. Updated HexIO to version 3.0
 	</PackageReleaseNotes>
-    <AssemblyVersion>2.2.0.0</AssemblyVersion>
-    <FileVersion>2.2.0.0</FileVersion>
-    <Version>2.2.0</Version>
+    <AssemblyVersion>2.1.0.0</AssemblyVersion>
+    <FileVersion>2.1.0.0</FileVersion>
+    <Version>2.1.0</Version>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>RfmOta.snk</AssemblyOriginatorKeyFile>
