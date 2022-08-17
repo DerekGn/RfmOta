@@ -23,6 +23,7 @@
 */
 
 using Microsoft.Extensions.DependencyInjection;
+using RfmOta.Factory;
 using RfmUsb;
 using System.Diagnostics.CodeAnalysis;
 
@@ -41,6 +42,7 @@ namespace RfmOta
         [ExcludeFromCodeCoverage]
         public static IServiceCollection AddOta(this IServiceCollection serviceCollection)
         {
+            serviceCollection.AddSingleton<IIntelHexStreamReaderFactory, IntelHexStreamReaderFactory>();
             serviceCollection.AddSingleton<IOtaService, OtaService>();
             serviceCollection.AddRfmUsb();
             return serviceCollection;
