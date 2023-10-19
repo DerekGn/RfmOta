@@ -28,7 +28,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using RfmOta.Exceptions;
 using RfmOta.Factory;
-using RfmUsb;
+using RfmUsb.Net;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -41,12 +41,12 @@ namespace RfmOta.UnitTests
     {
         private readonly Mock<IIntelHexStreamReaderFactory> _mockIntelHexReaderFactory;
         private readonly Mock<IIntelHexStreamReader> _mockIntelHexStreamReader;
-        private readonly Mock<IRfmUsb> _mockRfmUsb;
+        private readonly Mock<IRfm69> _mockRfmUsb;
         private readonly OtaService _otaService;
 
         public OtaServiceTests()
         {
-            _mockRfmUsb = new Mock<IRfmUsb>();
+            _mockRfmUsb = new Mock<IRfm69>();
             _mockIntelHexStreamReader = new Mock<IIntelHexStreamReader>();
             _mockIntelHexReaderFactory = new Mock<IIntelHexStreamReaderFactory>();
 
@@ -98,7 +98,7 @@ namespace RfmOta.UnitTests
         [Theory]
         [InlineData(-3)]
         [InlineData(21)]
-        public void TestOtaUpdateInvalidPowerLevel(int outputPower)
+        public void TestOtaUpdateInvalidPowerLevel(sbyte outputPower)
         {
             // Arrange
             var memoryStream = new MemoryStream();
