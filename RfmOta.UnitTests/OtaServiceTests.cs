@@ -88,28 +88,11 @@ namespace RfmOta.UnitTests
             };
 
             // Act
-            bool result = _otaService.OtaUpdate(1, memoryStream, out uint crc);
+            bool result = _otaService.OtaUpdate(memoryStream, out uint crc);
 
             // Assert
             result.Should().BeTrue();
             functionCalled.Should().BeTrue();
-        }
-
-        [Theory]
-        [InlineData(-3)]
-        [InlineData(21)]
-        public void TestOtaUpdateInvalidPowerLevel(sbyte outputPower)
-        {
-            // Arrange
-            var memoryStream = new MemoryStream();
-
-            _otaService._steps = new List<Func<bool>>();
-
-            // Act
-            Action action = () => _otaService.OtaUpdate(outputPower, memoryStream, out uint crc);
-
-            // Assert
-            action.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Specified argument was out of the range of valid values. (Parameter 'outputPower')");
         }
 
         [Fact]

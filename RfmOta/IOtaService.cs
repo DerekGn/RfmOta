@@ -36,12 +36,11 @@ namespace RfmOta
         /// <summary>
         /// Perform an Ota update of an Rfm69 node that is running in bootloader mode
         /// </summary>
-        /// <param name="outputPower">The output power for the RfmUsb</param>
         /// <param name="stream">The stream for the hex file to upload to the device</param>
         /// <param name="crc">The crc calculated for the uploaded flash image</param>
         /// <returns>true if the update succeeds</returns>
         /// <remarks>The <see cref="IOtaService"/> depends on an <see cref="IRfm69"/> instance to transmit and receive packets.
-        /// The containing application must open and close the <see cref="IRfm69"/> instance.</remarks>
-        bool OtaUpdate(sbyte outputPower, Stream stream, out uint crc);
+        /// The containing application must open initalise and close the <see cref="IRfm69"/> instance.</remarks>
+        bool OtaUpdate(Stream stream, out uint crc);
     }
 }

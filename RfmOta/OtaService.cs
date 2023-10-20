@@ -46,7 +46,7 @@ namespace RfmOta
         private readonly IIntelHexStreamReaderFactory _hexStreamReaderFactory;
         private readonly ILogger<IOtaService> _logger;
 
-        private readonly IRfm69 _rfmUsb;
+        private readonly IRfm _rfmUsb;
         private uint _crc;
         private bool _disposedValue;
         private uint _flashWriteSize;
@@ -58,7 +58,7 @@ namespace RfmOta
         /// <param name="logger">The <see cref="ILogger{IOtaService}"/> instance</param>
         /// <param name="rfmUsb">The <see cref="IRfm69"/> instance</param>
         /// <param name="hexStreamReaderFactory">The <see cref="IIntelHexStreamReaderFactory"/> instancec for creating <see cref="IntelHexStreamReader"/> instances</param>
-        public OtaService(ILogger<IOtaService> logger, IRfm69 rfmUsb, IIntelHexStreamReaderFactory hexStreamReaderFactory)
+        public OtaService(ILogger<IOtaService> logger, IRfm rfmUsb, IIntelHexStreamReaderFactory hexStreamReaderFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _rfmUsb = rfmUsb ?? throw new ArgumentNullException(nameof(rfmUsb));
@@ -82,18 +82,14 @@ namespace RfmOta
         }
 
         ///<inheritdoc/>
-        public bool OtaUpdate(sbyte outputPower, Stream stream, out uint crc)
+        public bool OtaUpdate(Stream stream, out uint crc)
         {
-            if (outputPower < -2 || outputPower > 20)
-                throw new ArgumentOutOfRangeException(nameof(outputPower));
-
             _stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
             bool result = true;
 
             crc = 0;
-            InitaliseRfmUsb(outputPower);
-
+            
             foreach (var step in _steps)
             {
                 if (!step())
@@ -323,25 +319,6 @@ namespace RfmOta
             }
 
             return result;
-        }
-
-        private void InitaliseRfmUsb(sbyte outputPower)
-        {
-            _logger.LogDebug($"Initialising the {nameof(IRfm69)} instance");
-
-            _rfmUsb.ExecuteReset();
-
-            _rfmUsb.PacketFormat = true;
-
-            _rfmUsb.TxStartCondition = true;
-
-            //_rfmUsb.RadioConfig = 23;
-
-            _rfmUsb.OutputPower = outputPower;
-
-            _rfmUsb.Sync = new List<byte>() { 0x55, 0x55 };
-
-            _rfmUsb.Timeout = 5000;
         }
 
         private bool SendAndValidateResponse(IList<byte> request,
