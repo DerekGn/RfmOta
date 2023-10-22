@@ -45,7 +45,7 @@ namespace RfmOta
         {
             serviceCollection.AddSingleton<IIntelHexStreamReaderFactory, IntelHexStreamReaderFactory>();
             serviceCollection.AddSingleton<IOtaService, OtaService>();
-            serviceCollection.AddRfm6x();
+            serviceCollection.AddRfmUsb();
             return serviceCollection;
         }
     }
