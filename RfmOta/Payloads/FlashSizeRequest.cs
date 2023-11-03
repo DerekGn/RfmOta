@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2022 Derek Goslin 
+* Copyright (c) 2023 Derek Goslin
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -22,32 +22,13 @@
 * SOFTWARE.
 */
 
-namespace RfmOta
+namespace RfmOta.Payloads
 {
-    /// <summary>
-    /// The OTA request type
-    /// </summary>
-    internal enum RequestType
+    internal class FlashSizeRequest : BaseRequest
     {
-        /// <summary>
-        /// Calculate the CRC of the application flash memory and store to device
-        /// </summary>
-        Crc,
-        /// <summary>
-        /// Ping the bootloader
-        /// </summary>
-        Ping,
-        /// <summary>
-        /// Write a set of bytes to flash
-        /// </summary>
-        Write,
-        /// <summary>
-        /// Reboot the device
-        /// </summary>
-        Reboot,
-        /// <summary>
-        /// Get the flash size from the device
-        /// </summary>
-        FlashSize
-    };
+        public FlashSizeRequest()
+            : base(RequestType.FlashSize, 1)
+        {
+        }
+    }
 }

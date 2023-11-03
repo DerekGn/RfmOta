@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2022 Derek Goslin
+* Copyright (c) 2023 Derek Goslin
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -22,22 +22,45 @@
 * SOFTWARE.
 */
 
-using HexIO;
-using System.Diagnostics.CodeAnalysis;
+using FluentAssertions;
+using RfmOta.Payloads;
 using System.IO;
+using Xunit;
 
-namespace RfmOta.Factory
+namespace RfmOta.UnitTests
 {
-    /// <summary>
-    /// A factory class for creation of <see cref="IntelHexStreamReader"/> instances
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public class IntelHexStreamReaderFactory : IIntelHexStreamReaderFactory
+    public class PayloadTests
     {
-        ///<inheritdoc/>
-        public IIntelHexStreamReader Create(Stream stream)
+        [Fact]
+        public void TestPingRequestSerialize()
         {
-            return new IntelHexStreamReader(stream);
+            // Arrange
+            var stream = new MemoryStream();
+
+            var pingRequest = new PingRequest();
+
+            // Act
+            pingRequest.Serialize(stream);
+
+            // Assert
+            stream.Length.Should().Be(2);
+            stream.ToArray().Should().Contain(new byte[] { 0x01, 0x01 });
+        }
+
+        [Fact]
+        public void TestPingResponseDeserialize()
+        {
+            // Arrange
+            var bytes = new byte[] {
+                0x07, (byte)ResponseType.Ping + 0x80, (byte)'v', (byte)'1', (byte)'.', (byte)'0',(byte)'.',(byte)'0',};
+
+            var pingResponse = new PingResponse();
+
+            // Act
+            pingResponse.Deserialize(bytes);
+
+            // Assert
+            pingResponse.BootLoaderVersion.Should().Be("v1.0.0");
         }
     }
 }

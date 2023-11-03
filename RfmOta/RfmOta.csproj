@@ -31,7 +31,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>D:\Git\RfmOta\RfmOta\RfmOta\RfmOta.xml</DocumentationFile>
+    <DocumentationFile>RfmOta.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

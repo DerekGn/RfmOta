@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2022 Derek Goslin 
+* Copyright (c) 2023 Derek Goslin
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -22,19 +22,13 @@
 * SOFTWARE.
 */
 
-namespace RfmOta
+namespace RfmOta.Payloads
 {
-    /// <summary>
-    /// The expected payload sizes for each of the request types
-    /// </summary>
-    internal static class PayloadSizes
+    internal class OkResponse : BaseResponse
     {
-        public const int FlashSizeResponse = 13;
-
-        public const int PingResponse = 1;
-
-        public const int CrcResponse = 5;
-
-        public const int OkResponse = 1;
+        public OkResponse()
+            : base(ResponseType.Ok, PayloadSizes.OkResponse)
+        {
+        }
     }
 }

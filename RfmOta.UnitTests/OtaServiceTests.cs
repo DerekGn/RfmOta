@@ -28,6 +28,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using RfmOta.Exceptions;
 using RfmOta.Factory;
+using RfmOta.Payloads;
 using RfmUsb.Net;
 using System;
 using System.Collections.Generic;
@@ -52,7 +53,6 @@ namespace RfmOta.UnitTests
 
             _otaService = new OtaService(
                 Mock.Of<ILogger<IOtaService>>(),
-                _mockRfmUsb.Object,
                 _mockIntelHexReaderFactory.Object);
         }
 
@@ -60,11 +60,11 @@ namespace RfmOta.UnitTests
         public void TestGetFlashSizeOk()
         {
             // Arrange
-            _mockRfmUsb.Setup(_ => _.TransmitReceive(It.IsAny<List<byte>>(), It.IsAny<int>()))
+            _mockRfmUsb.Setup(_ => _.TransmitReceive(It.IsAny<IList<byte>>(), It.IsAny<int>()))
                 .Returns(new List<byte>() { 13, (byte)ResponseType.FlashSize + 0x80, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55 });
 
             // Act
-            var result = _otaService.GetFlashSize();
+            var result = _otaService.GetFlashSize(_mockRfmUsb.Object);
 
             // Assert
             result.Should().BeTrue();
@@ -78,9 +78,9 @@ namespace RfmOta.UnitTests
             // Arrange
             var memoryStream = new MemoryStream();
 
-            _otaService._steps = new List<Func<bool>>()
+            _otaService._steps = new List<Func<IRfm, bool>>()
             {
-                () =>
+                (rfm) =>
                 {
                     functionCalled = true;
                     return true;
@@ -88,7 +88,7 @@ namespace RfmOta.UnitTests
             };
 
             // Act
-            bool result = _otaService.OtaUpdate(memoryStream, out uint crc);
+            bool result = _otaService.OtaUpdate(_mockRfmUsb.Object, memoryStream, out uint crc);
 
             // Assert
             result.Should().BeTrue();
@@ -99,11 +99,11 @@ namespace RfmOta.UnitTests
         public void TestPingBootLoaderOk()
         {
             // Arrange
-            _mockRfmUsb.Setup(_ => _.TransmitReceive(It.IsAny<List<byte>>(), It.IsAny<int>()))
-                .Returns(new List<byte>() { 1, (byte)ResponseType.Ping + 0x80 });
+            _mockRfmUsb.Setup(_ => _.TransmitReceive(It.IsAny<IList<byte>>(), It.IsAny<int>()))
+                .Returns(new List<byte>() { PayloadSizes.PingResponse, (byte)ResponseType.Ping + 0x80, (byte)'v', (byte)'.', (byte)'1', (byte)'.', (byte)'0', (byte)'.', (byte)'0' });
 
             // Act
-            var result = _otaService.PingBootLoader();
+            var result = _otaService.PingBootLoader(_mockRfmUsb.Object);
 
             // Assert
             result.Should().BeTrue();
@@ -116,7 +116,7 @@ namespace RfmOta.UnitTests
             _mockRfmUsb.Setup(_ => _.Transmit(It.IsAny<List<byte>>()));
 
             // Act
-            var result = _otaService.Reboot();
+            var result = _otaService.Reboot(_mockRfmUsb.Object);
 
             // Assert
             result.Should().BeTrue();
@@ -142,7 +142,7 @@ namespace RfmOta.UnitTests
             _otaService._flashInfo = new FlashInfo(0x0000, 20, 0x100);
 
             // Act
-            Action action = () => { var result = _otaService.SendHexData(); };
+            Action action = () => { var result = _otaService.SendHexData(_mockRfmUsb.Object); };
 
             // Assert
             action.Should().Throw<OtaException>().WithMessage("Invalid flash write size [0xCE] Max: [0x40]");
@@ -164,12 +164,12 @@ namespace RfmOta.UnitTests
                 .Returns(new IntelHexRecord(0x000, IntelHexRecordType.EndOfFile, new List<byte>() { }));
 
             _mockRfmUsb
-                .Setup(_ => _.TransmitReceive(It.IsAny<List<byte>>(), It.IsAny<int>()))
+                .Setup(_ => _.TransmitReceive(It.IsAny<IList<byte>>(), It.IsAny<int>()))
                 .Returns(new List<byte>() { 1, (byte)ResponseType.Ok + 0x80 });
 
             _otaService._flashInfo = new FlashInfo(0x0000, 20, 0x100);
             // Act
-            var result = _otaService.SendHexData();
+            var result = _otaService.SendHexData(_mockRfmUsb.Object);
 
             // Assert
             result.Should().BeTrue();
@@ -183,7 +183,7 @@ namespace RfmOta.UnitTests
                 .Returns(new List<byte>() { 1, (byte)ResponseType.ErrorInvalidLength + 0x80 });
 
             // Act
-            var result = _otaService.SetCrc();
+            var result = _otaService.SetCrc(_mockRfmUsb.Object);
 
             // Assert
             result.Should().BeFalse();
@@ -193,11 +193,11 @@ namespace RfmOta.UnitTests
         public void TestSetCrcOk()
         {
             // Arrange
-            _mockRfmUsb.Setup(_ => _.TransmitReceive(It.IsAny<List<byte>>(), It.IsAny<int>()))
+            _mockRfmUsb.Setup(_ => _.TransmitReceive(It.IsAny<IList<byte>>(), It.IsAny<int>()))
                 .Returns(new List<byte>() { 5, (byte)ResponseType.Crc + 0x80, 0xAA, 0x55, 0xAA, 0x55 });
 
             // Act
-            var result = _otaService.SetCrc();
+            var result = _otaService.SetCrc(_mockRfmUsb.Object);
 
             // Assert
             result.Should().BeTrue();

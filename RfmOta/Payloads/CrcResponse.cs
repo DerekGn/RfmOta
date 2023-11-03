@@ -22,22 +22,26 @@
 * SOFTWARE.
 */
 
-using HexIO;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace RfmOta.Factory
+namespace RfmOta.Payloads
 {
-    /// <summary>
-    /// A factory class for creation of <see cref="IntelHexStreamReader"/> instances
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public class IntelHexStreamReaderFactory : IIntelHexStreamReaderFactory
+    internal class CrcResponse : BaseResponse
     {
-        ///<inheritdoc/>
-        public IIntelHexStreamReader Create(Stream stream)
+        public CrcResponse()
+            : base(ResponseType.Crc, PayloadSizes.CrcResponse)
         {
-            return new IntelHexStreamReader(stream);
+        }
+
+        public uint Crc { get; private set; }
+
+        public override void Deserialize(IList<byte> bytes)
+        {
+            base.Deserialize(bytes);
+
+            Crc = BitConverter.ToUInt32(bytes.ToArray(), 2);
         }
     }
 }

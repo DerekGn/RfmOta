@@ -22,22 +22,41 @@
 * SOFTWARE.
 */
 
-using HexIO;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-
-namespace RfmOta.Factory
+namespace RfmOta.Payloads
 {
     /// <summary>
-    /// A factory class for creation of <see cref="IntelHexStreamReader"/> instances
+    /// The OTA request type
     /// </summary>
-    [ExcludeFromCodeCoverage]
-    public class IntelHexStreamReaderFactory : IIntelHexStreamReaderFactory
+    internal enum RequestType
     {
-        ///<inheritdoc/>
-        public IIntelHexStreamReader Create(Stream stream)
-        {
-            return new IntelHexStreamReader(stream);
-        }
-    }
+        /// <summary>
+        /// Calculate the CRC of the application flash memory and store to device
+        /// </summary>
+        Crc,
+
+        /// <summary>
+        /// Ping the bootloader
+        /// </summary>
+        Ping,
+
+        /// <summary>
+        /// Write a set of bytes to flash
+        /// </summary>
+        Write,
+
+        /// <summary>
+        /// Reboot the device
+        /// </summary>
+        Reboot,
+
+        /// <summary>
+        /// Get the flash size from the device
+        /// </summary>
+        FlashSize,
+
+        /// <summary>
+        /// Get the firmware version
+        /// </summary>
+        FirmwareVersion
+    };
 }

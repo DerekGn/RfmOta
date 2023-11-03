@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2022 Derek Goslin 
+* Copyright (c) 2022 Derek Goslin
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -22,44 +22,17 @@
 * SOFTWARE.
 */
 
-namespace RfmOta
+namespace RfmOta.Payloads
 {
     /// <summary>
-    /// The OTA response to the <see cref="RequestType"/>
+    /// The expected payload sizes for each of the request types
     /// </summary>
-    internal enum ResponseType
+    internal static class PayloadSizes
     {
-        /// <summary>
-        /// The requested operation executed correctly
-        /// </summary>
-        Ok,
-        /// <summary>
-        /// Calculate the application flash memory range crc
-        /// </summary>
-        Crc,
-        /// <summary>
-        /// Ping the boot loader
-        /// </summary>
-        Ping,
-        /// <summary>
-        /// Get the flash size from the target device
-        /// </summary>
-        FlashSize,
-        /// <summary>
-        /// The number of flash writes exceed the allowed number in one operation
-        /// </summary>
-        ErrorNumberWrites,
-        /// <summary>
-        /// The request message had an invalid length
-        /// </summary>
-        ErrorInvalidLength,
-        /// <summary>
-        /// 
-        /// </summary>
-        ErrorInvalidWrite,
-        /// <summary>
-        /// The flash write address is out of range
-        /// </summary>
-        ErrorInvalidWriteAddress
-    };
+        public const int CrcResponse = 5;
+        public const int FirmwareVersion = 7;
+        public const int FlashSizeResponse = 13;
+        public const int OkResponse = 1;
+        public const int PingResponse = 7;
+    }
 }

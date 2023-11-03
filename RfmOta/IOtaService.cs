@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2022 Derek Goslin 
+* Copyright (c) 2022 Derek Goslin
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@
 */
 
 using RfmUsb.Net;
-using System;
 using System.IO;
 
 namespace RfmOta
@@ -31,16 +30,17 @@ namespace RfmOta
     /// <summary>
     /// Defines the interface for the Ota service
     /// </summary>
-    public interface IOtaService : IDisposable
+    public interface IOtaService
     {
         /// <summary>
         /// Perform an Ota update of an Rfm69 node that is running in bootloader mode
         /// </summary>
+        /// <param name="rfm">The <see cref="IRfm"/> instance to transmit and receive ota update data</param>
         /// <param name="stream">The stream for the hex file to upload to the device</param>
         /// <param name="crc">The crc calculated for the uploaded flash image</param>
         /// <returns>true if the update succeeds</returns>
         /// <remarks>The <see cref="IOtaService"/> depends on an <see cref="IRfm69"/> instance to transmit and receive packets.
-        /// The containing application must open initalise and close the <see cref="IRfm69"/> instance.</remarks>
-        bool OtaUpdate(Stream stream, out uint crc);
+        /// The containing application must open initialise and close the <see cref="IRfm69"/> instance.</remarks>
+        bool OtaUpdate(IRfm rfm, Stream stream, out uint crc);
     }
 }

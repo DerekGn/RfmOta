@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2022 Derek Goslin 
+* Copyright (c) 2022 Derek Goslin
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ namespace RfmOta
         /// The upper address of the flash memory
         /// </summary>
         public uint UpperAddress => StartAddress + (PageSize * NumberOfPages);
-        
+
         /// <inheritdoc/>
         [ExcludeFromCodeCoverage]
         public override string ToString()

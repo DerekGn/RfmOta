@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2022 Derek Goslin
+* Copyright (c) 2023 Derek Goslin
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -22,22 +22,13 @@
 * SOFTWARE.
 */
 
-using HexIO;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-
-namespace RfmOta.Factory
+namespace RfmOta.Payloads
 {
-    /// <summary>
-    /// A factory class for creation of <see cref="IntelHexStreamReader"/> instances
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public class IntelHexStreamReaderFactory : IIntelHexStreamReaderFactory
+    internal class PingRequest : BaseRequest
     {
-        ///<inheritdoc/>
-        public IIntelHexStreamReader Create(Stream stream)
+        public PingRequest()
+            : base(RequestType.Ping, 1)
         {
-            return new IntelHexStreamReader(stream);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2022 Derek Goslin 
+* Copyright (c) 2022 Derek Goslin
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -45,6 +45,8 @@ namespace RfmOta
         /// The <see cref="IReadOnlyList{T}"/> of <see cref="IReadOnlyList{T}"/> of bytes to flash to the device
         /// </summary>
         public IReadOnlyList<IReadOnlyList<byte>> Writes => _writes.AsReadOnly();
+
+        public IReadOnlyList<byte> Payload => GetWritesBytes();
 
         /// <summary>
         /// Add a flash write

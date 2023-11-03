@@ -22,21 +22,56 @@
 * SOFTWARE.
 */
 
-using HexIO;
-using System.IO;
-
-namespace RfmOta.Factory
+namespace RfmOta.Payloads
 {
     /// <summary>
-    /// Defines a factory for <see cref="IIntelHexStreamReader"/> instances
+    /// The OTA response to the <see cref="RequestType"/>
     /// </summary>
-    public interface IIntelHexStreamReaderFactory
+    internal enum ResponseType
     {
         /// <summary>
-        /// Create an instance of a <see cref="IIntelHexStreamReader"/>
+        /// The requested operation executed correctly
         /// </summary>
-        /// <param name="stream">The <see cref="Stream"/> to create the reader for</param>
-        /// <returns>An instance of <see cref="IIntelHexStreamReader"/></returns>
-        IIntelHexStreamReader Create(Stream stream);
-    }
+        Ok,
+
+        /// <summary>
+        /// Calculate the application flash memory range crc
+        /// </summary>
+        Crc,
+
+        /// <summary>
+        /// Ping the boot loader
+        /// </summary>
+        Ping,
+
+        /// <summary>
+        /// Get the flash size from the target device
+        /// </summary>
+        FlashSize,
+
+        /// <summary>
+        /// Get the firmware version
+        /// </summary>
+        FirmwareVersion,
+
+        /// <summary>
+        /// The number of flash writes exceed the allowed number in one operation
+        /// </summary>
+        ErrorNumberWrites,
+
+        /// <summary>
+        /// The request message had an invalid length
+        /// </summary>
+        ErrorInvalidLength,
+
+        /// <summary>
+        ///
+        /// </summary>
+        ErrorInvalidWrite,
+
+        /// <summary>
+        /// The flash write address is out of range
+        /// </summary>
+        ErrorInvalidWriteAddress
+    };
 }

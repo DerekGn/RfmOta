@@ -1,7 +1,7 @@
 ﻿/*
 * MIT License
 *
-* Copyright (c) 2022 Derek Goslin
+* Copyright (c) 2023 Derek Goslin
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -22,22 +22,31 @@
 * SOFTWARE.
 */
 
-using HexIO;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace RfmOta.Factory
+namespace RfmOta.Payloads
 {
-    /// <summary>
-    /// A factory class for creation of <see cref="IntelHexStreamReader"/> instances
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public class IntelHexStreamReaderFactory : IIntelHexStreamReaderFactory
+    internal class FlashSizeResponse : BaseResponse
     {
-        ///<inheritdoc/>
-        public IIntelHexStreamReader Create(Stream stream)
+        public FlashSizeResponse()
+            : base(ResponseType.FlashSize, PayloadSizes.FlashSizeResponse)
         {
-            return new IntelHexStreamReader(stream);
+        }
+
+        public FlashInfo Info { get; private set; }
+
+        public override void Deserialize(IList<byte> bytes)
+        {
+            base.Deserialize(bytes);
+
+            Info = new FlashInfo
+                (
+                    BitConverter.ToUInt32(bytes.ToArray(), 2),
+                    BitConverter.ToUInt32(bytes.ToArray(), 6),
+                    BitConverter.ToUInt32(bytes.ToArray(), 10)
+                );
         }
     }
 }

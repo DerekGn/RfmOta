@@ -26,73 +26,68 @@ using HexIO;
 using Microsoft.Extensions.Logging;
 using RfmOta.Exceptions;
 using RfmOta.Factory;
+using RfmOta.Payloads;
 using RfmUsb.Net;
 using RfmUsb.Net.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace RfmOta
 {
-    internal class OtaService : IOtaService
+    /// <summary>
+    ///
+    /// </summary>
+    public class OtaService : IOtaService
     {
         internal FlashInfo _flashInfo;
-        internal List<Func<bool>> _steps;
+        internal List<Func<IRfm, bool>> _steps;
         private const int FlashWriteRows = 2;
         private const int MaxFlashWriteSize = 64;
         private readonly IIntelHexStreamReaderFactory _hexStreamReaderFactory;
         private readonly ILogger<IOtaService> _logger;
 
-        private readonly IRfm _rfmUsb;
         private uint _crc;
-        private bool _disposedValue;
         private uint _flashWriteSize;
-        private Stream _stream;
+        private IRfm? _rfm;
+        private Stream? _stream;
 
         /// <summary>
         /// Create an instance of a <see cref="OtaService"/>
         /// </summary>
         /// <param name="logger">The <see cref="ILogger{IOtaService}"/> instance</param>
-        /// <param name="rfmUsb">The <see cref="IRfm69"/> instance</param>
-        /// <param name="hexStreamReaderFactory">The <see cref="IIntelHexStreamReaderFactory"/> instancec for creating <see cref="IntelHexStreamReader"/> instances</param>
-        public OtaService(ILogger<IOtaService> logger, IRfm rfmUsb, IIntelHexStreamReaderFactory hexStreamReaderFactory)
+        /// <param name="hexStreamReaderFactory">The <see cref="IIntelHexStreamReaderFactory"/> instance for creating <see cref="IntelHexStreamReader"/> instances</param>
+        public OtaService(ILogger<IOtaService> logger, IIntelHexStreamReaderFactory hexStreamReaderFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _rfmUsb = rfmUsb ?? throw new ArgumentNullException(nameof(rfmUsb));
             _hexStreamReaderFactory = hexStreamReaderFactory ?? throw new ArgumentNullException(nameof(hexStreamReaderFactory));
 
-            _steps = new List<Func<bool>>
+            _steps = new List<Func<IRfm, bool>>
             {
-                () => PingBootLoader(),
-                () => GetFlashSize(),
-                () => SendHexData(),
-                () => SetCrc(),
-                () => Reboot()
+                PingBootLoader,
+                GetFirmwareVersion,
+                GetFlashSize,
+                SendHexData,
+                SetCrc,
+                Reboot
             };
         }
 
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
         ///<inheritdoc/>
-        public bool OtaUpdate(Stream stream, out uint crc)
+        public bool OtaUpdate(IRfm rfm, Stream stream, out uint crc)
         {
+            _rfm = rfm ?? throw new ArgumentNullException(nameof(rfm));
             _stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
             bool result = true;
 
             crc = 0;
-            
+
             foreach (var step in _steps)
             {
-                if (!step())
+                if (!step(rfm))
                 {
                     result = false;
                     break;
@@ -101,60 +96,61 @@ namespace RfmOta
 
             crc = _crc;
 
+            _stream = null;
+            _rfm = null;
+
             return result;
         }
 
-        internal bool GetFlashSize()
+        internal bool GetFirmwareVersion(IRfm rfm)
         {
-            return HandleRfmUsbOperation(
+            return HandleOperation(
                 nameof(OtaService),
                 () =>
                 {
-                    if (!SendAndValidateResponse(
-                        new List<byte>() { 0x01, (byte)RequestType.FlashSize },
-                        PayloadSizes.FlashSizeResponse, ResponseType.FlashSize, out IList<byte> response))
-                    {
-                        return false;
-                    }
+                    var response = SendRequest<FirmwareVersionResponse>(rfm, new FirmwareVersionRequest());
 
-                    _flashInfo = new FlashInfo(
-                        BitConverter.ToUInt32(response.ToArray(), 2),
-                        BitConverter.ToUInt32(response.ToArray(), 6),
-                        BitConverter.ToUInt32(response.ToArray(), 10));
+                    _logger.LogInformation("Firmware Version: [{version}]", response.Version);
 
+                    return true;
+                });
+        }
+
+        internal bool GetFlashSize(IRfm rfm)
+        {
+            return HandleOperation(
+                nameof(OtaService),
+                () =>
+                {
+                    _flashInfo = SendRequest<FlashSizeResponse>(rfm, new FlashSizeRequest()).Info;
                     _logger.LogInformation("FlashInfo: {flashInfo}", _flashInfo);
 
                     return true;
                 });
         }
 
-        internal bool PingBootLoader()
+        internal bool PingBootLoader(IRfm rfm)
         {
-            return HandleRfmUsbOperation(
+            return HandleOperation(
                 nameof(OtaService),
                 () =>
                 {
-                    if (!SendAndValidateResponse(
-                    new List<byte>() { 0x01, (byte)RequestType.Ping },
-                    PayloadSizes.PingResponse, ResponseType.Ping, out IList<byte> response))
-                    {
-                        _logger.LogInformation("BootLoader Ping NOk");
-                        return false;
-                    }
+                    var response = SendRequest<PingResponse>(rfm, new PingRequest());
 
-                    _logger.LogInformation("BootLoader Ping Ok");
+                    _logger.LogInformation("BootLoader Ping Ok. Bootloader Version: [{version}]",
+                        response.BootLoaderVersion);
 
                     return true;
                 });
         }
 
-        internal bool Reboot()
+        internal bool Reboot(IRfm rfm)
         {
-            return HandleRfmUsbOperation(
+            return HandleOperation(
                 nameof(OtaService),
                 () =>
                 {
-                    SendRequest(new List<byte>() { 0x01, (byte)RequestType.Reboot });
+                    SendRequest(rfm, new RebootRequest());
 
                     _logger.LogInformation("Reboot Pending");
 
@@ -162,9 +158,9 @@ namespace RfmOta
                 });
         }
 
-        internal bool SendHexData()
+        internal bool SendHexData(IRfm rfm)
         {
-            return HandleRfmUsbOperation(
+            return HandleOperation(
                 nameof(OtaService),
                 () =>
                 {
@@ -176,22 +172,10 @@ namespace RfmOta
 
                         if (flashWrites.Writes.Count > 0)
                         {
-                            var payload = flashWrites.GetWritesBytes();
+                            var request = new FlashWriteRequest(flashWrites);
+                            var response = SendRequest<OkResponse>(rfm, new FlashWriteRequest(flashWrites));
 
-                            var request = new List<byte>
-                            {
-                                (byte)(payload.Count + 2),
-                                (byte)RequestType.Write,
-                                (byte)flashWrites.Writes.Count,
-                            };
-
-                            request.AddRange(payload);
-
-                            if (!SendAndValidateResponse(
-                                request, PayloadSizes.OkResponse, ResponseType.Ok, out IList<byte> response))
-                            {
-                                return false;
-                            }
+                            _logger.LogDebug("Total bytes flashed [{bytes}]", _flashWriteSize);
                         }
                         else
                         {
@@ -200,48 +184,24 @@ namespace RfmOta
                     } while (true);
 
                     _logger.LogInformation(
-                        "[{name}] Flash Complete Image Size: [0x{flashWriteSize:X}]",
-                        nameof(SendHexData), _flashWriteSize);
+                        "[{name}] Flash Complete Image Size: [0x{flashWriteSize:X}] [{flashWriteSize}]",
+                        nameof(SendHexData), _flashWriteSize, _flashWriteSize);
                     return true;
                 });
         }
 
-        internal bool SetCrc()
+        internal bool SetCrc(IRfm rfm)
         {
-            return HandleRfmUsbOperation(
+            return HandleOperation(
                 nameof(OtaService),
                 () =>
                 {
-                    var requestBytes = new List<byte>() { 0x05, (byte)RequestType.Crc };
-                    requestBytes.AddRange(BitConverter.GetBytes(_flashWriteSize));
+                    _crc = SendRequest<CrcResponse>(rfm, new CrcRequest(_flashWriteSize)).Crc;
 
-                    if (!SendAndValidateResponse(
-                        requestBytes,
-                        PayloadSizes.CrcResponse,
-                        ResponseType.Crc, out IList<byte> response))
-                    {
-                        return false;
-                    }
-
-                    _crc = BitConverter.ToUInt32(response.ToArray(), 2);
                     _logger.LogInformation("Flash Crc: [0x{crc:X}]", _crc);
 
                     return true;
                 });
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    _rfmUsb?.Close();
-                    _rfmUsb?.Dispose();
-                }
-
-                _disposedValue = true;
-            }
         }
 
         private FlashWrites GetFlashWrites(IIntelHexStreamReader hexReader)
@@ -294,7 +254,7 @@ namespace RfmOta
         }
 
         [DebuggerStepThrough]
-        private bool HandleRfmUsbOperation(string className, Func<bool> operation, [CallerMemberName] string memberName = "")
+        private bool HandleOperation(string className, Func<bool> operation, [CallerMemberName] string memberName = "")
         {
             var sw = new Stopwatch();
             bool result;
@@ -310,20 +270,82 @@ namespace RfmOta
             }
             catch (RfmUsbTransmitException ex)
             {
-                _logger.LogError("A transmission exception occurred executing [{className}].[{memberName}] Reason: [{ex.Message}]",
+                _logger.LogError("A transmission exception occurred executing [{className}].[{memberName}] Reason: [{message}]",
                     className, memberName, ex.Message);
                 _logger.LogDebug(ex, "A transmission exception occurred executing [{className}].[{memberName}]",
                     className, memberName);
 
-                return false;
+                result = false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unhandled exception occurred");
+
+                result = false;
             }
 
             return result;
         }
 
-        private bool SendAndValidateResponse(IList<byte> request,
-                                            int expectedSize, ResponseType expectedResponse,
-            out IList<byte> response, [CallerMemberName] string memberName = "")
+        private T SendRequest<T>(IRfm rfm, IRequest request, [CallerMemberName] string memberName = "") where T : IResponse
+        {
+            IResponse result = null;
+
+            var sw = new Stopwatch();
+
+            try
+            {
+                sw.Start();
+
+                using var stream = new MemoryStream();
+                request.Serialize(stream);
+
+                var responseBytes = rfm.TransmitReceive(stream.ToArray(), 5000);
+
+                var responseType = responseBytes[1];
+
+#warning TODO response type validation
+
+                switch (responseType)
+                {
+                    case (byte)ResponseType.Ping | 0x80:
+                        result = new PingResponse();
+                        result.Deserialize(responseBytes);
+                        break;
+
+                    case (byte)ResponseType.FlashSize | 0x80:
+                        result = new FlashSizeResponse();
+                        result.Deserialize(responseBytes);
+                        break;
+
+                    case (byte)ResponseType.Ok | 0x80:
+                        result = new OkResponse();
+                        result.Deserialize(responseBytes);
+                        break;
+
+                    case (byte)ResponseType.Crc | 0x80:
+                        result = new CrcResponse();
+                        result.Deserialize(responseBytes);
+                        break;
+
+                    case (byte)ResponseType.FirmwareVersion | 0x80:
+                        result = new FirmwareVersionResponse();
+                        result.Deserialize(responseBytes);
+                        break;
+                }
+            }
+            finally
+            {
+                sw.Stop();
+            }
+
+            _logger.LogDebug("BootLoader {memberName} Ok. Tx Time: [{elapsed} ms] Rx Rssi: [{rssi}]",
+                memberName, (sw.ElapsedTicks * 1000 / Stopwatch.Frequency), rfm.LastRssi);
+
+            return (T)result;
+        }
+
+        private void SendRequest(IRfm rfm, IRequest request, [CallerMemberName] string memberName = "")
         {
             var sw = new Stopwatch();
 
@@ -331,31 +353,10 @@ namespace RfmOta
             {
                 sw.Start();
 
-                response = _rfmUsb.TransmitReceive(request, 5000);
+                using var stream = new MemoryStream();
+                request.Serialize(stream);
 
-                if (response.Count == 0 || response.Count < expectedSize)
-                {
-                    _logger.LogError("Invalid response received [{response}]",
-                        BitConverter.ToString(response.ToArray()));
-
-                    return false;
-                }
-
-                if (response[0] != (byte)expectedSize)
-                {
-                    _logger.LogInformation("BootLoader Invalid {memberName} Response Length: [{response}]",
-                        memberName, response[0]);
-
-                    return false;
-                }
-
-                if (response[1] != (byte)expectedResponse + 0x80)
-                {
-                    _logger.LogInformation("BootLoader Invalid {memberName} Response: [{response}]",
-                        memberName, (ResponseType)(response[1] - 0x80));
-
-                    return false;
-                }
+                rfm.Transmit(stream.ToArray());
             }
             finally
             {
@@ -364,30 +365,6 @@ namespace RfmOta
 
             _logger.LogInformation("BootLoader {memberName} Ok. Tx Time: [{elapsed} ms]",
                 memberName, (sw.ElapsedTicks * 1000 / Stopwatch.Frequency));
-
-            return true;
         }
-
-        private void SendRequest(IList<byte> request, [CallerMemberName] string memberName = "")
-        {
-            var sw = new Stopwatch();
-
-            try
-            {
-                sw.Start();
-
-                _rfmUsb.Transmit(request);
-            }
-            finally
-            {
-                sw.Stop();
-            }
-
-            _logger.LogInformation("BootLoader {memberName} Ok. Tx Time: [{elapsed} ms]",
-                memberName, (sw.ElapsedTicks * 1000 / Stopwatch.Frequency));
-        }
-
-        #region
-        #endregion
     }
 }
