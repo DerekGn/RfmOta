@@ -22,11 +22,9 @@
 * SOFTWARE.
 */
 
-using FluentAssertions;
 using HexIO;
 using Microsoft.Extensions.Logging;
 using Moq;
-using RfmOta.Exceptions;
 using RfmOta.Factory;
 using RfmUsb.Net;
 using System;
@@ -51,7 +49,7 @@ namespace RfmOta.UnitTests
             _mockIntelHexReaderFactory = new Mock<IIntelHexStreamReaderFactory>();
 
             _otaService = new OtaService(
-                Mock.Of<ILogger<IOtaService>>(),
+                Mock.Of<ILogger<OtaService>>(),
                 _mockRfmUsb.Object,
                 _mockIntelHexReaderFactory.Object);
         }
@@ -61,13 +59,13 @@ namespace RfmOta.UnitTests
         {
             // Arrange
             _mockRfmUsb.Setup(_ => _.TransmitReceive(It.IsAny<List<byte>>(), It.IsAny<int>()))
-                .Returns(new List<byte>() { 13, (byte)ResponseType.FlashSize + 0x80, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55 });
+                .Returns([13, (byte)ResponseType.FlashSize + 0x80, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55]);
 
             // Act
             var result = _otaService.GetFlashSize();
 
             // Assert
-            result.Should().BeTrue();
+            Assert.True(result);
         }
 
         [Fact]
@@ -91,8 +89,9 @@ namespace RfmOta.UnitTests
             bool result = _otaService.OtaUpdate(1, memoryStream, out uint crc);
 
             // Assert
-            result.Should().BeTrue();
-            functionCalled.Should().BeTrue();
+            Assert.True(result);
+            Assert.Equal<uint>(0, crc);
+            Assert.True(functionCalled);
         }
 
         [Theory]
@@ -106,10 +105,11 @@ namespace RfmOta.UnitTests
             _otaService._steps = new List<Func<bool>>();
 
             // Act
-            Action action = () => _otaService.OtaUpdate(outputPower, memoryStream, out uint crc);
+            void action() => _otaService.OtaUpdate(outputPower, memoryStream, out uint _);
 
             // Assert
-            action.Should().Throw<ArgumentOutOfRangeException>().WithMessage("Specified argument was out of the range of valid values. (Parameter 'outputPower')");
+            ArgumentException exception = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Specified argument was out of the range of valid values. (Parameter 'outputPower')", exception.Message);
         }
 
         [Fact]
@@ -123,7 +123,7 @@ namespace RfmOta.UnitTests
             var result = _otaService.PingBootLoader();
 
             // Assert
-            result.Should().BeTrue();
+            Assert.True(result);
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace RfmOta.UnitTests
             var result = _otaService.Reboot();
 
             // Assert
-            result.Should().BeTrue();
+            Assert.True(result);
         }
 
         [Fact]
@@ -159,10 +159,11 @@ namespace RfmOta.UnitTests
             _otaService._flashInfo = new FlashInfo(0x0000, 20, 0x100);
 
             // Act
-            Action action = () => { var result = _otaService.SendHexData(); };
+            void action() { _otaService.SendHexData(); }
 
             // Assert
-            action.Should().Throw<OtaException>().WithMessage("Invalid flash write size [0xCE] Max: [0x40]");
+            ArgumentException exception = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Invalid flash write size [0xCE] Max: [0x40]", exception.Message);
         }
 
         [Fact]
@@ -189,7 +190,7 @@ namespace RfmOta.UnitTests
             var result = _otaService.SendHexData();
 
             // Assert
-            result.Should().BeTrue();
+            Assert.True(result);
         }
 
         [Fact]
@@ -203,7 +204,7 @@ namespace RfmOta.UnitTests
             var result = _otaService.SetCrc();
 
             // Assert
-            result.Should().BeFalse();
+            Assert.False(result);
         }
 
         [Fact]
@@ -217,7 +218,7 @@ namespace RfmOta.UnitTests
             var result = _otaService.SetCrc();
 
             // Assert
-            result.Should().BeTrue();
+            Assert.True(result);
         }
     }
 }
