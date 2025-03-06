@@ -22,6 +22,9 @@
 * SOFTWARE.
 */
 
+
+// Ignore Spelling: Ota
+
 using RfmUsb.Net;
 using System;
 using System.IO;

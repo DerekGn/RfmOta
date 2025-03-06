@@ -22,6 +22,9 @@
 * SOFTWARE.
 */
 
+
+// Ignore Spelling: Rfm Ota
+
 using HexIO;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;

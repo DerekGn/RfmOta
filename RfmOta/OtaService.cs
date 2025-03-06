@@ -22,6 +22,9 @@
 * SOFTWARE.
 */
 
+
+// Ignore Spelling: Ota
+
 using HexIO;
 using Microsoft.Extensions.Logging;
 using RfmOta.Exceptions;

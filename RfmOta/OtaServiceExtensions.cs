@@ -22,6 +22,9 @@
 * SOFTWARE.
 */
 
+
+// Ignore Spelling: Ota
+
 using Microsoft.Extensions.DependencyInjection;
 using RfmOta.Factory;
 using RfmUsb;
@@ -45,7 +48,7 @@ namespace RfmOta
         {
             serviceCollection.AddSingleton<IIntelHexStreamReaderFactory, IntelHexStreamReaderFactory>();
             serviceCollection.AddSingleton<IOtaService, OtaService>();
-            serviceCollection.AddRfm6x();
+            serviceCollection.AddRfmUsb();
             return serviceCollection;
         }
     }
