@@ -27,6 +27,6 @@ jobs:
         uses: softprops/action-gh-release@v2.0.8
         with:
           files: |
-            /home/runner/work/RfmOta/RfmOta/bin/Debug/RfmOta*.nupkg
+            /home/runner/work/RfmOta/RfmOta/RfmOta/bin/Release/RfmOta*.nupkg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
