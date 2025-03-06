@@ -22,6 +22,9 @@
 * SOFTWARE.
 */
 
+
+// Ignore Spelling: Ota
+
 using HexIO;
 using Microsoft.Extensions.Logging;
 using RfmOta.Exceptions;
@@ -37,7 +40,10 @@ using System.Runtime.CompilerServices;
 
 namespace RfmOta
 {
-    internal class OtaService : IOtaService
+    /// <summary>
+    /// The over the air updated service for Rfm devices
+    /// </summary>
+    public class OtaService : IOtaService
     {
         internal FlashInfo _flashInfo;
         internal List<Func<bool>> _steps;
@@ -57,8 +63,8 @@ namespace RfmOta
         /// </summary>
         /// <param name="logger">The <see cref="ILogger{IOtaService}"/> instance</param>
         /// <param name="rfmUsb">The <see cref="IRfm69"/> instance</param>
-        /// <param name="hexStreamReaderFactory">The <see cref="IIntelHexStreamReaderFactory"/> instancec for creating <see cref="IntelHexStreamReader"/> instances</param>
-        public OtaService(ILogger<IOtaService> logger, IRfm69 rfmUsb, IIntelHexStreamReaderFactory hexStreamReaderFactory)
+        /// <param name="hexStreamReaderFactory">The <see cref="IIntelHexStreamReaderFactory"/> instance for creating <see cref="IntelHexStreamReader"/> instances</param>
+        public OtaService(ILogger<OtaService> logger, IRfm69 rfmUsb, IIntelHexStreamReaderFactory hexStreamReaderFactory)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _rfmUsb = rfmUsb ?? throw new ArgumentNullException(nameof(rfmUsb));
@@ -76,7 +82,7 @@ namespace RfmOta
 
         public void Dispose()
         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            // Do not change this code. Put clean-up code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
@@ -126,7 +132,7 @@ namespace RfmOta
                         BitConverter.ToUInt32(response.ToArray(), 6),
                         BitConverter.ToUInt32(response.ToArray(), 10));
 
-                    _logger.LogInformation("FlashInfo: {flashInfo}", _flashInfo);
+                    _logger.LogInformation("FlashInfo: {FlashInfo}", _flashInfo);
 
                     return true;
                 });
@@ -204,7 +210,7 @@ namespace RfmOta
                     } while (true);
 
                     _logger.LogInformation(
-                        "[{name}] Flash Complete Image Size: [0x{flashWriteSize:X}]",
+                        "[{Name}] Flash Complete Image Size: [0x{FlashWriteSize:X}]",
                         nameof(SendHexData), _flashWriteSize);
                     return true;
                 });
@@ -228,7 +234,7 @@ namespace RfmOta
                     }
 
                     _crc = BitConverter.ToUInt32(response.ToArray(), 2);
-                    _logger.LogInformation("Flash Crc: [0x{crc:X}]", _crc);
+                    _logger.LogInformation("Flash Crc: [0x{Crc:X}]", _crc);
 
                     return true;
                 });
@@ -260,7 +266,7 @@ namespace RfmOta
 
                 if (intelHexRecord.RecordType == IntelHexRecordType.Data)
                 {
-                    _logger.LogDebug("Read Intel Hex Data Record [{intelHexRecord}]", intelHexRecord);
+                    _logger.LogDebug("Read Intel Hex Data Record [{IntelHexRecord}]", intelHexRecord);
 
                     if (intelHexRecord.Bytes.Count > MaxFlashWriteSize)
                     {
@@ -309,14 +315,14 @@ namespace RfmOta
                 result = operation();
                 sw.Stop();
 
-                _logger.LogDebug("Executed [{className}].[{memberName}] in [{totalMilliseconds}] ms",
+                _logger.LogDebug("Executed [{ClassName}].[{MemberName}] in [{TotalMilliseconds}] ms",
                     className, memberName, sw.Elapsed.TotalMilliseconds);
             }
             catch (RfmUsbTransmitException ex)
             {
-                _logger.LogError("A transmission exception occurred executing [{className}].[{memberName}] Reason: [{ex.Message}]",
+                _logger.LogError("A transmission exception occurred executing [{ClassName}].[{MemberName}] Reason: [{Message}]",
                     className, memberName, ex.Message);
-                _logger.LogDebug(ex, "A transmission exception occurred executing [{className}].[{memberName}]",
+                _logger.LogDebug(ex, "A transmission exception occurred executing [{ClassName}].[{MemberName}]",
                     className, memberName);
 
                 return false;
@@ -345,7 +351,7 @@ namespace RfmOta
         }
 
         private bool SendAndValidateResponse(IList<byte> request,
-                                            int expectedSize, ResponseType expectedResponse,
+            int expectedSize, ResponseType expectedResponse,
             out IList<byte> response, [CallerMemberName] string memberName = "")
         {
             var sw = new Stopwatch();
@@ -358,7 +364,7 @@ namespace RfmOta
 
                 if (response.Count == 0 || response.Count < expectedSize)
                 {
-                    _logger.LogError("Invalid response received [{response}]",
+                    _logger.LogError("Invalid response received [{Response}]",
                         BitConverter.ToString(response.ToArray()));
 
                     return false;
@@ -366,7 +372,7 @@ namespace RfmOta
 
                 if (response[0] != (byte)expectedSize)
                 {
-                    _logger.LogInformation("BootLoader Invalid {memberName} Response Length: [{response}]",
+                    _logger.LogInformation("BootLoader Invalid {MemberName} Response Length: [{Response}]",
                         memberName, response[0]);
 
                     return false;
@@ -374,7 +380,7 @@ namespace RfmOta
 
                 if (response[1] != (byte)expectedResponse + 0x80)
                 {
-                    _logger.LogInformation("BootLoader Invalid {memberName} Response: [{response}]",
+                    _logger.LogInformation("BootLoader Invalid {MemberName} Response: [{Response}]",
                         memberName, (ResponseType)(response[1] - 0x80));
 
                     return false;
@@ -385,7 +391,7 @@ namespace RfmOta
                 sw.Stop();
             }
 
-            _logger.LogInformation("BootLoader {memberName} Ok. Tx Time: [{elapsed} ms]",
+            _logger.LogInformation("BootLoader {MemberName} Ok. Tx Time: [{Elapsed} ms]",
                 memberName, (sw.ElapsedTicks * 1000 / Stopwatch.Frequency));
 
             return true;
@@ -406,11 +412,8 @@ namespace RfmOta
                 sw.Stop();
             }
 
-            _logger.LogInformation("BootLoader {memberName} Ok. Tx Time: [{elapsed} ms]",
+            _logger.LogInformation("BootLoader {MemberName} Ok. Tx Time: [{Elapsed} ms]",
                 memberName, (sw.ElapsedTicks * 1000 / Stopwatch.Frequency));
         }
-
-        #region
-        #endregion
     }
 }

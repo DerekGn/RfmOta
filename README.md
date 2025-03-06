@@ -1,8 +1,8 @@
 # RfmOta
 
-[![Build Status](https://dev.azure.com/DerekGn/GitHub/_apis/build/status/DerekGn.RfmOta?branchName=main)](https://dev.azure.com/DerekGn/GitHub/_build/latest?definitionId=6&branchName=main)
+![GitHub Actions](https://github.com/DerekGn/RfmOta/actions/workflows/build.yml/badge.svg)
 
-[![NuGet Badge](https://buildstats.info/nuget/RfmOta)](https://www.nuget.org/packages/RfmOta/)
+[![NuGet](https://img.shields.io/nuget/v/RfmOta.svg?style=flat-square)](https://www.nuget.org/packages/RfmOta/)
 
 A library for the flashing hex files to Rfm69 nodes over the air.
 
@@ -18,7 +18,7 @@ Install-Package RfmOta
 
 The RfmOta package is compatible with the following runtimes:
 
-* .NET Standard 2.1
+* .NET Core 8
 
 ## Using OtaService
 
