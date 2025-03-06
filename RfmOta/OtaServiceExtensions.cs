@@ -27,7 +27,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using RfmOta.Factory;
-using RfmUsb;
 using RfmUsb.Net;
 using System.Diagnostics.CodeAnalysis;
 

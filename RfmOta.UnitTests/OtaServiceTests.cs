@@ -25,6 +25,7 @@
 using HexIO;
 using Microsoft.Extensions.Logging;
 using Moq;
+using RfmOta.Exceptions;
 using RfmOta.Factory;
 using RfmUsb.Net;
 using System;
@@ -108,7 +109,7 @@ namespace RfmOta.UnitTests
             void action() => _otaService.OtaUpdate(outputPower, memoryStream, out uint _);
 
             // Assert
-            ArgumentException exception = Assert.Throws<ArgumentException>(action);
+            ArgumentOutOfRangeException exception = Assert.Throws<ArgumentOutOfRangeException>(action);
             Assert.Equal("Specified argument was out of the range of valid values. (Parameter 'outputPower')", exception.Message);
         }
 
@@ -162,7 +163,7 @@ namespace RfmOta.UnitTests
             void action() { _otaService.SendHexData(); }
 
             // Assert
-            ArgumentException exception = Assert.Throws<ArgumentException>(action);
+            OtaException exception = Assert.Throws<OtaException>(action);
             Assert.Equal("Invalid flash write size [0xCE] Max: [0x40]", exception.Message);
         }
 

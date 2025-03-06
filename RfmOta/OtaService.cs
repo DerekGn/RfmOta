@@ -40,7 +40,10 @@ using System.Runtime.CompilerServices;
 
 namespace RfmOta
 {
-    internal class OtaService : IOtaService
+    /// <summary>
+    /// The over the air updated service for Rfm devices
+    /// </summary>
+    public class OtaService : IOtaService
     {
         internal FlashInfo _flashInfo;
         internal List<Func<bool>> _steps;
