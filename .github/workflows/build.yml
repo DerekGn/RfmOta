@@ -30,4 +30,4 @@ jobs:
       if: success() || failure()        # run this step even if previous step failed
       with:
         name: test-results
-        path: /home/runner/work/RfmOta/RfmOta.UnitTests/TestResults/test-results.trx
+        path: /home/runner/work/RfmOta/RfmOta/RfmOta.UnitTests/TestResults/test-results.trx
